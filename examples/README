@@ -1,0 +1,14 @@
+
+Example 1
+
+DriftWaveConfig.xml describes a two-species plasma containing ions and electrons, 
+with density gradients but no temperature gradients. The file contains a simple
+scan, where k_y is varied from 0.25 to 25, and the most unstable mode is tracked.
+
+This example can be run by executing
+
+./DispSolver -c DriftWaveConfig.xml
+
+'ky-drift-wave-test' contains reference output for this configuration. 
+
+The unstable mode in question is the electrostatic drift wave.

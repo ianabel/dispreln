@@ -25,14 +25,12 @@ WARNINGS
 What Now?
 =================================================================================
 
-There are several executables in this package for solving specific dispersion
-relationships.
+If you have a functional C++ build environment, 'make' should produce the main
+executable file 'DispSolver'. This is driven by an XML configuration file.
 
-GKSlab: The full electromagnetic GK dispersion relation in an unsheared slab with
-gradients of density and temperature for arbitrary species. The derivation of this
-dispersion relation is included in LinearGK.tex
+Example configurations files will be in the examples/ directory. 
 
-EdgeSlab: The linearisation of the reduced equations for a pedestal edge.
+Full documentation is in the docs/ subdirectory.
 
-
-
+The licence and copying restrictions for this software is contained in the 
+COPYING file.
