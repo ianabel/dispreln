@@ -1,0 +1,38 @@
+==================================================================================
+README for Dispersion Relation Solver Package
+Copyright 2018 Ian Abel
+==================================================================================
+
+A framework for solving the kinds of dispersion relations that arise from slab
+gyrokinetics and its close relatives.
+
+=================================================================================
+WARNINGS
+=================================================================================
+
+1. These implementations have been only tested to moderate tolerances.
+   It may not be possible to achieve machine precision with the current
+   implementations.
+
+2. The efficiency of these algorithms was *sufficient for the job at hand* when 
+   they were first written. It is by no means the optimal implementation.
+
+3. The build system, such as it is,  is a makefile. It is less portable than your
+   average ten ton rock. It works on modern linux distributions, including 
+   debian (buster or newer) and ubuntu. 
+
+=================================================================================
+What Now?
+=================================================================================
+
+There are several executables in this package for solving specific dispersion
+relationships.
+
+GKSlab: The full electromagnetic GK dispersion relation in an unsheared slab with
+gradients of density and temperature for arbitrary species. The derivation of this
+dispersion relation is included in LinearGK.tex
+
+EdgeSlab: The linearisation of the reduced equations for a pedestal edge.
+
+
+
