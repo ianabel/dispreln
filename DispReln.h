@@ -1,6 +1,7 @@
 #ifndef DISPRELN_H
 #define DISPRELN_H
 
+#define __STDCPP_WANT_MATH_SPEC_FUNCS__ 1
 #include <boost/math/constants/constants.hpp>
 #include <complex>
 #include <list>
