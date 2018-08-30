@@ -1,0 +1,19 @@
+Project Plans
+=======================
+
+Physics:
+	1) Add the bi-Maxwellian dispersion relation from Kunz et. al.
+	2) Benchmark against gs2, include gs2 input files for comparison.
+
+Root Finding:
+	1) Add root-finding over a general polygonal domain, not just rectangles.
+	2) Improve the direct solver to adaptively use higher-order methods than just
+	the secant method.
+	3) Multi-dimensional parameter scanning
+	4) Improved root-tracking
+
+Software
+	1) Fully document the configuration file
+	2) Write an XML schema or move to a different statically-analyzable configuration
+	format. 
+	3) Increase Test Coverage

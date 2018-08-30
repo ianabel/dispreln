@@ -24,7 +24,7 @@ CXXRELEASEFLAGS += -Ofast
 all: DispSolver
 
 DispSolver: DispSolver.cpp Solver.cpp RootFinder.o RootFinder.h Faddeeva.o Faddeeva.hh DispReln.cpp Config.cpp
-	$(CXX) $(CXXFLAGS) -lboost_program_options -o $@ DispSolver.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
+	$(CXX) $(CXXFLAGS) -Ofast -lboost_program_options -o $@ DispSolver.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
 
 test: RootFindingTests DispRelnTests
 	LD_LIBRARY_PATH=$(BOOSTLIBDIR) ./RootFindingTests
@@ -34,20 +34,15 @@ test: RootFindingTests DispRelnTests
 RootFindingTests: RootFindingTests.cpp RootFinder.h RootFinder.cpp Solver.cpp
 	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) $(CXXTESTFLAGS) -o $@ RootFindingTests.cpp RootFinder.cpp Solver.cpp
 
-DispRelnTests: DispRelnTests.cpp RootFinder.h DispReln.cpp DispReln.h RootFinder.cpp Solver.cpp  Faddeeva.o Faddeeva.hh
-	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) $(CXXTESTFLAGS) -o $@ DispRelnTests.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp
+DispRelnTests: DispRelnTests.cpp RootFinder.h DispReln.cpp DispReln.h RootFinder.cpp Solver.cpp  Faddeeva.o Faddeeva.hh Config.h Config.cpp
+	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) $(CXXTESTFLAGS) -o $@ DispRelnTests.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
 
-tmp-test: main.cpp DispReln.cpp DispReln.h RootFinder.cpp RootFinder.h Solver.cpp Faddeeva.o Config.h Config.cpp
-	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) -o $@ main.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
-
+# We never need a debug-enabled version of this.
 Faddeeva.o: Faddeeva.cc Faddeeva.hh
 	$(CXX) $(CXXFLAGS) $(CXXRELEASEFLAGS) -c -o $@ Faddeeva.cc
 
-conftest: conftest.cpp Config.cpp Config.h Faddeeva.o
-	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) -o $@ conftest.cpp Config.cpp Faddeeva.o Config.h
-
 
 clean:
-	rm -f DispRelnTests RootFindingTests tmp-test Faddeeva.o conftest
+	rm -f DispRelnTests RootFindingTests *.o
 
 .PHONY: clean test

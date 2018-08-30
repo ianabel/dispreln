@@ -12,6 +12,7 @@
 
 #include "DispReln.h"
 #include "RootFinder.h"
+#include "Config.h"
 
 
 
@@ -148,5 +149,60 @@ BOOST_AUTO_TEST_CASE( acoustic_tracking_test )
 
 }
 
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE( config_tests )
+
+BOOST_AUTO_TEST_CASE( example1_test )
+{
+	static std::string config_file( "examples/DriftWaveConfig.xml" );
+	DispReln::ElectrostaticSlab DriftSlab =  DispReln::Config::ReadConfig<DispReln::ElectrostaticSlab>( config_file );
+
+	BOOST_TEST( DriftSlab.SpeciesList.size() == 2 );
+	DispReln::Species ions = DriftSlab.SpeciesList.front().s;
+	DispReln::Species electrons = DriftSlab.SpeciesList.back().s;
+
+	BOOST_TEST( ions.Temperature == 1.0 );
+	BOOST_TEST( ions.Density == 1.0 );
+	BOOST_TEST( ions.Z == 1.0 );
+	BOOST_TEST( ions.mass == 1.0 );
+	BOOST_TEST( ions.fprim == 7.0 );
+	BOOST_TEST( ions.tprim == 0.0 );
+
+	BOOST_TEST( electrons.Temperature == 1.0 );
+	BOOST_TEST( electrons.Density == 1.0 );
+	BOOST_TEST( electrons.Z == -1.0 );
+	BOOST_TEST( electrons.mass == 0.000272443711 );
+	BOOST_TEST( electrons.fprim == 7.0 );
+	BOOST_TEST( electrons.tprim == 0.0 );
+
+	auto scans = DispReln::Config::GenerateScans( config_file );
+	BOOST_TEST( scans.size() == 1 );
+	auto MainScan = scans.front();
+	BOOST_TEST( MainScan.fixed.size() == 2 );
+	BOOST_TEST( ( int )MainScan.fixed.front().first == ( int )DispReln::Config::ScanTypes::kpar );
+	BOOST_TEST( ( int )MainScan.fixed.back().first == ( int )DispReln::Config::ScanTypes::kx );
+
+	BOOST_TEST( MainScan.fixed.front().second == 1.0 );
+	BOOST_TEST( MainScan.fixed.back().second == 0.0 );
+
+	BOOST_TEST( ( int )MainScan.parameter == ( int )DispReln::Config::ScanTypes::ky );
+		
+	
+	std::list<double> RefValues{0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0, 13.5, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0};
+
+	BOOST_TEST( MainScan.values == RefValues, boost::test_tools::per_element() );
+
+	std::complex<double> l( -5.0, -2.0 ),u( 5.0, 2.0 );
+
+	BOOST_TEST( MainScan.box.lower == l );
+	BOOST_TEST( MainScan.box.upper == u );
+
+
+
+
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()
