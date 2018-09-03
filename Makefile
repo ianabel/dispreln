@@ -15,7 +15,7 @@ ifdef BOOSTINCDIR
 CXXFLAGS += -I$(BOOSTINCDIR) -L$(BOOSTLIBDIR) -Wl,-rpath-link=$(BOOSTLIBDIR)  
 endif
 
-CXXFLAGS += -Wall -pedantic -std=c++14
+CXXFLAGS += -Wall -pedantic -std=c++17
 CXXDEBUGFLAGS +=  -Og -g
 CXXTESTFLAGS +=   -DBOOST_TEST_DYN_LINK -lboost_unit_test_framework
 CXXRELEASEFLAGS += -Ofast

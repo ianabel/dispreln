@@ -167,7 +167,6 @@ namespace DispReln {
 						{
 							std::istringstream lower_s( subtags.second.get<std::string>( "lower" ) );
 							std::istringstream upper_s( subtags.second.get<std::string>( "upper" ) );
-							std::complex<double> l,u;
 							lower_s >> badger_Scan.box.lower;
 							upper_s >> badger_Scan.box.upper;
 						}

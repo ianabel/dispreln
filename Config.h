@@ -1,10 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <string>
 #include "DispReln.h"
 #include "RootFinder.h"
 
+#include <string>
 
 
 namespace DispReln {

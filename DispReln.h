@@ -3,6 +3,7 @@
 
 #define __STDCPP_WANT_MATH_SPEC_FUNCS__ 1
 #include <boost/math/constants/constants.hpp>
+#include <cmath>
 #include <complex>
 #include <list>
 #include <vector>
