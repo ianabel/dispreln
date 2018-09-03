@@ -15,7 +15,7 @@ ifdef BOOSTINCDIR
 CXXFLAGS += -I$(BOOSTINCDIR) -L$(BOOSTLIBDIR) -Wl,-rpath-link=$(BOOSTLIBDIR)  
 endif
 
-CXXFLAGS += -Wall -pedantic -std=c++17
+CXXFLAGS += -Wall -pedantic -std=c++14
 CXXDEBUGFLAGS +=  -Og -g
 CXXTESTFLAGS +=   -DBOOST_TEST_DYN_LINK -lboost_unit_test_framework
 CXXRELEASEFLAGS += -Ofast
@@ -43,6 +43,6 @@ Faddeeva.o: Faddeeva.cc Faddeeva.hh
 
 
 clean:
-	rm -f DispRelnTests RootFindingTests *.o
+	rm -f DispSolver DispRelnTests RootFindingTests *.o
 
 .PHONY: clean test

@@ -1,3 +1,4 @@
+#define __STDCPP_WANT_MATH_SPEC_FUNCS__ 1
 
 #include <iostream>
 #include <iomanip>
@@ -106,11 +107,11 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 
 	std::list< std::pair< Complex, Real > > scan;
 
-	DispReln::ky_scanner kyScan( physics );
-	DispReln::kpar_scanner kparScan( physics );
-	DispReln::kx_scanner kxScan( physics );
-	DispReln::fprim_scanner fprimScan( physics, MainScan.sIndex );
-	DispReln::tprim_scanner tprimScan( physics, MainScan.sIndex );
+	DispReln::ky_scanner<T> kyScan( physics );
+	DispReln::kpar_scanner<T> kparScan( physics );
+	DispReln::kx_scanner<T> kxScan( physics );
+	DispReln::fprim_scanner<T> fprimScan( physics, MainScan.sIndex );
+	DispReln::tprim_scanner<T> tprimScan( physics, MainScan.sIndex );
 
 	switch ( MainScan.parameter )
 	{
