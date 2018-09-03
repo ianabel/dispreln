@@ -24,7 +24,7 @@ namespace RootFinder {
 	struct RootBoundingBox {
 		Complex lower;
 		Complex upper; 
-		unsigned int Index;
+		int Index;
 
 		RootBoundingBox() : lower( 0.0 ), upper( 0.0 ), Index( 0 ) {};
 		RootBoundingBox( RootBoundingBox const& rb ) : lower( rb.lower ), upper( rb.upper ), Index( rb.Index ) {};
