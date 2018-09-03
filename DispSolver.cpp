@@ -109,6 +109,9 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 	DispReln::ky_scanner kyScan( physics );
 	DispReln::kpar_scanner kparScan( physics );
 	DispReln::kx_scanner kxScan( physics );
+	DispReln::fprim_scanner fprimScan( physics, MainScan.sIndex );
+	DispReln::tprim_scanner tprimScan( physics, MainScan.sIndex );
+
 	switch ( MainScan.parameter )
 	{
 		case DispReln::Config::ScanTypes::kpar:
@@ -120,6 +123,13 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 		case DispReln::Config::ScanTypes::kx:
 			scan = DoScan( MainScan, kxScan );
 			break;
+		case DispReln::Config::ScanTypes::fprim:
+			scan = DoScan( MainScan, fprimScan );
+			break;
+		case DispReln::Config::ScanTypes::tprim:
+			scan = DoScan( MainScan, tprimScan );
+			break;
+
 		default:
 			scan.clear();
 			break;

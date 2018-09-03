@@ -107,6 +107,7 @@ namespace DispReln {
 				{
 					ScanTypes param;
 					ScanMode mode;
+					unsigned int speciesIndex = 0;
 
 					std::string parameter = tags.second.get<std::string>( "<xmlattr>.parameter" );
 					auto it = ScanMap.find( parameter );
@@ -115,6 +116,17 @@ namespace DispReln {
 						param = it->second;
 					else
 						throw std::invalid_argument( "Unknown Paramter to scan in: " + parameter  );
+
+					if ( param == ScanTypes::fprim || param == ScanTypes::tprim )
+					{
+						// Needs a species index
+						try {
+							speciesIndex = tags.second.get<unsigned int>( "<xmlattr>.species" );
+						} catch ( ... )
+						{
+							throw std::invalid_argument( "When you scan in density or temperature gradient you need to specify which species to scan in." );
+						}
+					}
 					
 					std::string type = tags.second.get<std::string>( "<xmlattr>.type" );
 					if ( type == "MostUnstableMode" )
@@ -125,6 +137,7 @@ namespace DispReln {
 						throw std::invalid_argument( "Unknown Scanning Mode: " + type );
 
 					Scan badger_Scan( param, mode );
+					badger_Scan.sIndex = speciesIndex;
 					for ( auto &subtags : tags.second )
 					{
 						if ( subtags.first == "val" )

@@ -26,8 +26,9 @@ namespace DispReln {
 			std::list<double> values;
 			std::list<Fixture> fixed;
 			RootFinder::RootBoundingBox box;
+			unsigned int sIndex;
 			Scan( ScanTypes x, ScanMode y ) { parameter = x; mode = y; values.clear(); fixed.clear();};
-			Scan( Scan const& o ) : parameter( o.parameter ), mode( o.mode ), values( o.values ), fixed( o.fixed ), box( o.box ) {};
+			Scan( Scan const& o ) : parameter( o.parameter ), mode( o.mode ), values( o.values ), fixed( o.fixed ), box( o.box ), sIndex( o.sIndex ) {};
 		};
 
 		std::list<Scan> GenerateScans( std::string const& filename );

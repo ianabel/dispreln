@@ -5,6 +5,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <complex>
 #include <list>
+#include <vector>
 
 
 namespace DispReln {
@@ -96,6 +97,15 @@ namespace DispReln {
 				recalculate();
 			}
 
+			ElectrostaticSlab( std::vector<Species> const & spec_list )
+			{
+				SpeciesList.clear();
+				for ( auto i : spec_list )
+					SpeciesList.emplace_back( i );
+				_kpar = 1.0; _kx=0; _ky=0;
+				recalculate();
+			}
+
 			ElectrostaticSlab( std::initializer_list<Species> const & spec_list )
 			{
 				SpeciesList.clear();
@@ -160,7 +170,7 @@ namespace DispReln {
 			}
 
 
-			std::list<_species> SpeciesList;
+			std::vector<_species> SpeciesList;
 			ElectrostaticSlab( ElectrostaticSlab const &other )
 				: SpeciesList( other.SpeciesList )
 			{
@@ -182,6 +192,16 @@ namespace DispReln {
 	class GKSlab {
 		public:
 			GKSlab( std::list<Species> const & spec_list, double beta )
+			{
+				SpeciesList.clear();
+				for ( auto i : spec_list )
+					SpeciesList.emplace_back( i );
+				_kpar = 1.0; _kx=0; _ky=0;
+				beta_ref = beta;
+				recalculate();
+			}
+
+			GKSlab( std::vector<Species> const & spec_list, double beta )
 			{
 				SpeciesList.clear();
 				for ( auto i : spec_list )
@@ -256,7 +276,7 @@ namespace DispReln {
 			}
 
 
-			std::list<_species> SpeciesList;
+			std::vector<_species> SpeciesList;
 			GKSlab( GKSlab const &other )
 				: SpeciesList( other.SpeciesList )
 			{
@@ -276,6 +296,92 @@ namespace DispReln {
 		protected:
 			double _kpar,_kx,_ky;
 			double alpha_ref;
+
+	};
+
+	class EdgeSlab {
+		public:
+			EdgeSlab( std::list<Species> const & spec_list )
+			{
+				SpeciesList.clear();
+				for ( auto i : spec_list )
+					SpeciesList.emplace_back( i );
+				_kpar = 1.0; _kx=0; _ky=0;
+				recalculate();
+			}
+
+			Complex operator()( Complex xi )
+			{
+				// _ky & _kx come normalized to rho_ref
+				// k_|| normalized to a;
+				Complex D( 0.0, 0.0 );
+				for ( auto x : SpeciesList )
+				{
+					if ( x.s.mass == 0.0 )
+					{
+						D += x.boltz;
+						continue;
+					}
+
+					Complex xi_s = x.vt*xi;
+					
+					D += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
+
+				}
+				return D;
+			}
+			void set_kpar( double kp ){_kpar = kp;recalculate();};
+			void set_kx( double kx ){_kx= kx;recalculate();};
+			void set_ky( double ky ){_ky= ky;recalculate();};
+
+			struct _species {
+				DispReln::Species s;
+				Real om_star,om_star_t,alpha;
+				Real vt,boltz;
+				_species( Species const& s_in ) : s( s_in ),om_star( 0.0 ),om_star_t( 0.0 ),alpha( 0.0 )
+				{
+					vt = ::sqrt( s_in.mass/s_in.Temperature );
+					boltz = s_in.Z*s_in.Z*s_in.Density / s_in.Temperature;
+				};
+				_species( _species const& _s_in ) : s( _s_in.s ), om_star( _s_in.om_star ), om_star_t( _s_in.om_star_t ), alpha( _s_in.alpha )
+				{
+					vt = ::sqrt( _s_in.s.mass/_s_in.s.Temperature );
+					boltz = _s_in.s.Z*_s_in.s.Z*_s_in.s.Density / _s_in.s.Temperature;
+				};
+			};
+
+			void recalculate()
+			{
+				for ( auto &x : SpeciesList ) 
+				{
+					x.s.rho = ::sqrt( x.s.Temperature * x.s.mass )/::abs( x.s.Z );
+					x.om_star = ( x.s.Z / ::abs ( x.s.Z ) )*0.5 * _ky * x.s.rho * x.s.fprim /  _kpar;
+					x.om_star_t = ( x.s.Z / ::abs ( x.s.Z ) )*0.5 * _ky * x.s.rho * x.s.tprim /  _kpar;
+					x.alpha = ( _ky*_ky + _kx*_kx )*( x.s.rho * x.s.rho )/2.0;
+					x.vt = ::sqrt( x.s.mass / x.s.Temperature );
+					x.boltz = x.s.Z * x.s.Z * x.s.Density / x.s.Temperature;
+				}
+			}
+
+
+			std::vector<_species> SpeciesList;
+			EdgeSlab( EdgeSlab const &other )
+				: SpeciesList( other.SpeciesList )
+			{
+				_kpar = other._kpar; _kx = other._kx; _ky = other._ky;
+				recalculate();
+			};
+			EdgeSlab()
+			{
+				SpeciesList.reserve( 2 );
+				SpeciesList.emplace_back( Species( 1.0, 1.0, 1.0, 1.0, 0.0, 0.0 ) );
+				SpeciesList.emplace_back( Species( 1.0, 1.0, 1.0, 1.0, 0.0, 0.0 ) );
+				_kpar = 0.0;
+				_ky = 0.0;
+				_kx = 0.0;
+			};
+		protected:
+			double _kpar,_kx,_ky;
 
 	};
 }

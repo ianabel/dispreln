@@ -48,4 +48,31 @@ template<typename T> struct eta_i_scanner
 		impl.SpeciesList.front.s.tprim = eta_i*impl.SpeciesList.front.s.tprim;
 	}
 };
+
+template<typename T> struct fprim_scanner 
+{
+	T impl;
+	unsigned int N;
+	fprim_scanner( fprim_scanner<T> const& other ) : impl( other.impl ), N( other.N ) {};
+	fprim_scanner( T const & in, unsigned int m ) : impl( in ),N( m ) {};
+	Complex operator()( Complex xi ) { return impl( xi );};
+	void set_param( Real fprim )
+	{
+		impl.SpeciesList[ N ].s.fprim = fprim;
+	}
+};
+
+template<typename T> struct tprim_scanner 
+{
+	T impl;
+	unsigned int N;
+	tprim_scanner( tprim_scanner<T> const& other ) : impl( other.impl ), N( other.N ) {};
+	tprim_scanner( T const & in, unsigned int m ) : impl( in ),N( m ) {};
+	Complex operator()( Complex xi ) { return impl( xi );};
+	void set_param( Real tprim )
+	{
+		impl.SpeciesList[ N ].s.tprim = tprim;
+	}
+};
+
 }
