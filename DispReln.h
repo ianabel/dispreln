@@ -159,6 +159,11 @@ namespace DispReln {
 			void set_ky( double ky ){_ky= ky;recalculate();};
 			void set_beta(  double /* beta */ ) {};
 
+			double get_kpar(){return _kpar;};
+			double get_kx(){return _kx;};
+			double get_ky(){return _ky;};
+
+
 			struct _species {
 				DispReln::Species s;
 				Real om_star,om_star_t,alpha;
@@ -271,6 +276,10 @@ namespace DispReln {
 			void set_kpar( double kp ){_kpar = kp;recalculate();};
 			void set_kx( double kx ){_kx= kx;recalculate();};
 			void set_ky( double ky ){_ky= ky;recalculate();};
+			
+			double get_kpar(){return _kpar;};
+			double get_kx(){return _kx;};
+			double get_ky(){return _ky;};
 
 			struct _species {
 				DispReln::Species s;

@@ -146,26 +146,23 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 	return scan;
 }
 
-void OutputScan( DispReln::Config::Scan const& scan, std::list< std::pair<Complex,Real> > scan_results )
+template<typename T> void OutputScan( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results );
+template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results )
 {
 	std::cout << Header( scan ) << std::endl;
 
-	double norm,beta;
+	double norm;
 
 	switch ( scan.normalization )
 	{
 		case DispReln::Config::Normalization::Default:
 			norm = 1.0;
 			break;
-		case DispReln::Config::Normalization::Alfven:
-			// ASSERT( Scan Type != beta scan )
-			beta = scan.beta;
-			if ( beta == 0.0 )
-				throw std::invalid_argument( "Attempting to use an Alfvenic normalization for an electrostatic run!" );
-			norm = 1.0/::sqrt( beta );
+		case DispReln::Config::Normalization::kRef:
+			norm = physics.get_kpar();
 			break;
 		default:
-			norm = 1.0;
+			throw std::invalid_argument( "Attempting to use an Alfvenic normalization for an electrostatic run!" );
 			break;
 	}
 	for ( auto &x : scan_results )
@@ -177,6 +174,40 @@ void OutputScan( DispReln::Config::Scan const& scan, std::list< std::pair<Comple
 
 }
 
+template<> void OutputScan<DispReln::GKSlab>( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results )
+{
+	std::cout << Header( scan ) << std::endl;
+
+	double norm,beta;
+	norm = 1.0;
+
+	switch ( scan.normalization )
+	{
+		case DispReln::Config::Normalization::Default:
+			break;
+		case DispReln::Config::Normalization::kRef:
+			norm = physics.get_kpar();
+			break;
+		case DispReln::Config::Normalization::kAlfven:
+			norm = physics.get_kpar();
+		case DispReln::Config::Normalization::Alfven:
+			beta = physics.beta_ref;
+			if ( scan.beta != 0.0 )
+				beta = scan.beta;
+			norm /= ::sqrt( beta );
+			break;
+		default:
+			throw std::invalid_argument( "Unsupported Normalization" );
+			break;
+	}
+	for ( auto &x : scan_results )
+	{
+		std::cout << x.second << "\t" << x.first.real()/norm << "\t" << x.first.imag()/norm << std::endl;
+	}
+
+	std::cout << Footer( scan ) << std::endl;
+
+}
 
 template<typename T> int RunAllScans( std::list<DispReln::Config::Scan> ScanList, T physics )
 {
