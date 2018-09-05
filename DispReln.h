@@ -8,6 +8,7 @@
 #include <list>
 #include <vector>
 
+#include "ExpBessel.h"
 
 namespace DispReln {
 	using Real = double;
@@ -20,19 +21,35 @@ namespace DispReln {
 	template<unsigned int> std::complex<double> Zeta( std::complex<double> xi );
 	template<unsigned int,unsigned int,unsigned int> double Gamma( double );
 
+
 	template<> double inline Gamma<1,0,0>( double alpha )
 	{
-		return std::exp( -alpha ) * std::cyl_bessel_i( 0.0, alpha );
+		return ExpBessel<0>( alpha );
 	}
 
 	template<> double inline Gamma<2,1,0>( double alpha )
 	{
-		return std::exp( -alpha ) * ( std::cyl_bessel_i( 0.0, alpha ) - std::cyl_bessel_i( 1.0, alpha ) );
+		return ExpBessel<0>( alpha ) - ExpBessel<1>( alpha );
 	}
 
 	template<> double inline Gamma<3,0,0>( double alpha )
 	{
-		return std::exp( -alpha ) * ( std::cyl_bessel_i( 0.0, alpha ) + alpha * ( std::cyl_bessel_i( 1.0, alpha ) - std::cyl_bessel_i( 0.0, alpha ) ) );
+		return ExpBessel<0>( alpha ) + alpha * ( ExpBessel<1>( alpha ) - ExpBessel<0>( alpha ) );
+	}
+
+	template<> double inline Gamma<3,1,1>( double alpha )
+	{
+		return 2.0*( ExpBessel<0>( alpha ) - ExpBessel<1>( alpha ) );
+	}
+	
+	template<> double inline Gamma<4,1,0>( double alpha )
+	{
+		return ( 2.0*( 1.0 - alpha )*ExpBessel<0>( alpha ) - ( 1.0 - 2.0*alpha ) *  ExpBessel<1>( alpha ) );
+	}
+	
+	template<> double inline Gamma<5,1,1>( double alpha )
+	{
+		return 2.0 * ( ( 3.0 - 2.0*alpha )*ExpBessel<0>( alpha ) - 2.0*( 1.0 - alpha )*ExpBessel<1>( alpha ) );
 	}
 
 	// General Gamma<l,m,n> can be done if you have a generalized hypergeometric pFq
@@ -140,6 +157,12 @@ namespace DispReln {
 			void set_kpar( double kp ){_kpar = kp;recalculate();};
 			void set_kx( double kx ){_kx= kx;recalculate();};
 			void set_ky( double ky ){_ky= ky;recalculate();};
+			void set_beta(  double /* beta */ ) {};
+
+			double get_kpar(){return _kpar;};
+			double get_kx(){return _kx;};
+			double get_ky(){return _ky;};
+
 
 			struct _species {
 				DispReln::Species s;
@@ -232,19 +255,31 @@ namespace DispReln {
 				{
 					Complex xi_s = x.vt*xi;
 
+					/*
 					A += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
 					B += ( x.boltz/x.vt ) * ( xi_s  - ( xi_s - x.om_star )*Gamma<1,0,0>( x.alpha ) + x.om_star_t*( Gamma<3,0,0>( x.alpha ) + 0.5*Gamma<1,0,0>( x.alpha ) ) );
 					C += ( x.s.Z * x.s.Density ) * ( ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<2,1,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<4,1,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<2,1,0>( x.alpha ) ) );
 					D += ( x.s.Temperature * x.s.Density ) * ( -( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<3,1,1>( x.alpha ) + x.om_star_t*( Zeta<0>( xi_s )*Gamma<5,1,1>( x.alpha ) + Zeta<2>( xi_s )*Gamma<3,1,1>( x.alpha ) ) );
-					E += ( x.boltz/x.vt ) * ( ( xi_s - x.om_star )*Gamma<2,1,0>( x.alpha ) - x.om_star_t*( Gamma<4,1,0>( x.alpha ) + 0.5*Gamma<2,1,0>( x.alpha ) ) );
+					E += ( x.s.Z/x.vt ) * ( ( xi_s - x.om_star )*Gamma<2,1,0>( x.alpha ) - x.om_star_t*( Gamma<4,1,0>( x.alpha ) + 0.5*Gamma<2,1,0>( x.alpha ) ) );
+					*/
+
+					A += ( x.boltz )*( 1.0 + xi_s*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) );
+					B += ( x.boltz ) * ( 1.0  - Gamma<1,0,0>( x.alpha ) );
+					C += ( x.s.Z * x.s.Density ) * ( xi_s*Zeta<0>( xi_s )*Gamma<2,1,0>( x.alpha ) );
+					D += ( x.s.Temperature * x.s.Density ) * ( xi_s*Zeta<0>( xi_s )*Gamma<3,1,1>( x.alpha ) );
+					E += ( x.s.Z ) * ( Gamma<2,1,0>( x.alpha ) );
 
 				}
 
-				return  ( A*alpha_ref/beta_ref - A*B + B*B )*( 2.0*A/beta_ref - A*D + C*C) - (A*E + B*C)*(A*E + B*C);
+				return  ( A*alpha_ref/( xi*xi*beta_ref ) - A*B + B*B )*( 2.0*A/beta_ref - A*D + C*C) - (A*E + B*C)*(A*E + B*C);
 			}
 			void set_kpar( double kp ){_kpar = kp;recalculate();};
 			void set_kx( double kx ){_kx= kx;recalculate();};
 			void set_ky( double ky ){_ky= ky;recalculate();};
+			
+			double get_kpar(){return _kpar;};
+			double get_kx(){return _kx;};
+			double get_ky(){return _ky;};
 
 			struct _species {
 				DispReln::Species s;
@@ -294,6 +329,7 @@ namespace DispReln {
 				beta_ref = 0.0;
 			};
 			double beta_ref;
+			void set_beta(  double beta ) { beta_ref = beta;};
 		protected:
 			double _kpar,_kx,_ky;
 			double alpha_ref;

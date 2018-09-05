@@ -36,7 +36,7 @@ std::ostream& operator<<( std::ostream& os, std::list<Complex> l )
 	return os;
 }
 
-std::string Header( DispReln::Config::Scan Scan )
+std::string Header( DispReln::Config::Scan const& Scan )
 {
 	std::ostringstream out( "" );
 	std::string col_header;
@@ -71,6 +71,11 @@ std::string Header( DispReln::Config::Scan Scan )
 	return out.str();
 }
 
+std::string Footer( DispReln::Config::Scan const& Scan )
+{
+	return "\n\n";
+}
+
 template<typename T> std::list<std::pair<Complex,Real> > DoScan( DispReln::Config::Scan MainScan, T scanner )
 {
 	switch ( MainScan.mode )
@@ -99,6 +104,9 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 				break;
 			case DispReln::Config::ScanTypes::kx:
 				physics.set_kx( f.second );
+				break;
+			case DispReln::Config::ScanTypes::beta:
+				physics.set_beta( f.second );
 				break;
 			default:
 				break;
@@ -138,14 +146,76 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 	return scan;
 }
 
+template<typename T> void OutputScan( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results );
+template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results )
+{
+	std::cout << Header( scan ) << std::endl;
+
+	double norm;
+
+	switch ( scan.normalization )
+	{
+		case DispReln::Config::Normalization::Default:
+			norm = 1.0;
+			break;
+		case DispReln::Config::Normalization::kRef:
+			norm = physics.get_kpar();
+			break;
+		default:
+			throw std::invalid_argument( "Attempting to use an Alfvenic normalization for an electrostatic run!" );
+			break;
+	}
+	for ( auto &x : scan_results )
+	{
+		std::cout << x.second << "\t" << x.first.real()/norm << "\t" << x.first.imag()/norm << std::endl;
+	}
+
+	std::cout << Footer( scan ) << std::endl;
+
+}
+
+template<> void OutputScan<DispReln::GKSlab>( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results )
+{
+	std::cout << Header( scan ) << std::endl;
+
+	double norm,beta;
+	norm = 1.0;
+
+	switch ( scan.normalization )
+	{
+		case DispReln::Config::Normalization::Default:
+			break;
+		case DispReln::Config::Normalization::kRef:
+			norm = physics.get_kpar();
+			break;
+		case DispReln::Config::Normalization::kAlfven:
+			norm = physics.get_kpar();
+		case DispReln::Config::Normalization::Alfven:
+			beta = physics.beta_ref;
+			if ( scan.beta != 0.0 )
+				beta = scan.beta;
+			norm /= ::sqrt( beta );
+			break;
+		default:
+			throw std::invalid_argument( "Unsupported Normalization" );
+			break;
+	}
+	for ( auto &x : scan_results )
+	{
+		std::cout << x.second << "\t" << x.first.real()/norm << "\t" << x.first.imag()/norm << std::endl;
+	}
+
+	std::cout << Footer( scan ) << std::endl;
+
+}
+
 template<typename T> int RunAllScans( std::list<DispReln::Config::Scan> ScanList, T physics )
 {
 	for ( auto &S : ScanList )
 	{
 		std::list< std::pair<Complex,Real> > scan_results;
 		scan_results = PerformScan( S, physics );
-		std::cout << Header( S ) << std::endl;
-		std::cout << scan_results << std::endl;
+		OutputScan( S, scan_results );
 	}
 	return 0;
 }
@@ -158,7 +228,11 @@ namespace po = boost::program_options;
 int main( int argc, char** argv )
 {
 	po::options_description desc( "Allowed Options" );
-	desc.add_options()( "help", "Produce this help message" )( "config-file,c", po::value<std::string>(), "Configuration file" );
+	desc.add_options()
+		( "help", "Produce this help message" )
+		( "config-file,c", po::value<std::string>(), "Configuration file" )
+		( "simulate,s", "Parse the configuration, and produce an output detailing what parameter scans will be done, without actually performing the scans." )
+		;
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);

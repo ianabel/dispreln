@@ -1,0 +1,53 @@
+
+<gkslab beta_ref="1.0">
+	<species Temperature="1.0" Density="1.0" Charge="1.0" Mass="1.0" fprim="0.0" tprim="0.0"/>
+	<species Temperature="1.0" Density="1.0" Charge="-1.0" Mass="0.000548579909" fprim="0.0" tprim="0.0"/>
+</gkslab>
+
+<scan parameter="ky" type="TrackRoot">
+	<fixed kpar="1.0" kx="0.0" beta_ref="1.0"/>
+	<output normalization="alfven"/>
+	<box>
+		<lower>(0.5,-0.5)</lower>
+		<upper>(1.5,0.5)</upper>
+	</box>
+	<range>
+		<llim>0.1</llim>
+		<ulim>1.0</ulim>
+		<increment>0.025</increment>
+	</range>
+	<range>
+		<llim>1.0</llim>
+		<ulim>10.0</ulim>
+		<increment>0.25</increment>
+	</range>
+	<range>
+		<llim>10.0</llim>
+		<ulim>80.0</ulim>
+		<increment>1.0</increment>
+	</range>
+</scan>
+
+<scan parameter="ky" type="TrackRoot">
+	<fixed kpar="1.0" kx="0.0" beta_ref="0.1"/>
+	<output normalization="alfven"/>
+	<box>
+		<lower>(2.5,-0.5)</lower>
+		<upper>(3.5,0.5)</upper>
+	</box>
+	<range>
+		<llim>0.1</llim>
+		<ulim>1.0</ulim>
+		<increment>0.025</increment>
+	</range>
+	<range>
+		<llim>1.0</llim>
+		<ulim>10.0</ulim>
+		<increment>0.25</increment>
+	</range>
+	<range>
+		<llim>10.0</llim>
+		<ulim>80.0</ulim>
+		<increment>1.0</increment>
+	</range>
+</scan>
