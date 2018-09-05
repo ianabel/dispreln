@@ -5,7 +5,7 @@
 #include <functional>
 
 #include <list>
-#include <ostream>
+#include <iostream>
 #include <boost/math/constants/constants.hpp>
 
 
@@ -72,9 +72,10 @@ namespace RootFinder {
 	{
 		std::list< std::pair<Complex,Real> > RootList;
 		RootBoundingBox bounds = Initial;
-		static unsigned int MAX_REFINE = 10;
-		static Real RefineFac = 0.8;
-		static Real ExpandFac = 1.2;
+		static unsigned int MAX_REFINE = 20;
+		static Real RefineFac = 0.75;
+		static Real ExpandFac = 1.25;
+		RootList.clear();
 
 		for ( auto alpha : params )
 		{
@@ -82,15 +83,42 @@ namespace RootFinder {
 			F.set_param( alpha );
 
 			int N_ROOT = -1;
+			// Move box to be centred on a guess at the next root
+			if ( RootList.size() >= 2 ) {
+				/*
+				// Linear extrapolation
+				auto old_soln = RootList.rbegin();
+				auto older_soln = --RootList.rbegin();
+				Complex old_root = old_soln->first;
+				Complex older_root = older_soln->first;
+				Real old_alpha = old_soln->second;
+				Real older_alpha = older_soln->second;
+				Complex rootGuess = old_root + ( alpha - old_alpha )*( old_root - older_root )/( old_alpha - older_alpha );
+				bounds.recentre( rootGuess );
+				*/
+				bounds.recentre( RootList.rbegin()->first );
+				if ( abs( bounds.diag() ) > abs( Initial.diag() )*2.0 )
+					bounds.scale( 0.5 );
+			} else if ( RootList.size() == 1 ) {
+				// Only have one data point, so just centre on that
+				bounds.recentre( RootList.rbegin()->first );
+			} else {
+				bounds = Initial;
+			}
+				
+			// std::cerr << "New alpha is " << alpha << " and we are now looking in " << bounds; 
+
 			for ( unsigned i=0; N_ROOT != 1 && i < MAX_REFINE; i++ )
 			{
 				N_ROOT = WindingNumber( RectangleImage( bounds, F ) );
 				if ( N_ROOT == 0 )
 					bounds.scale( ExpandFac );
-				if ( N_ROOT > 1 )
+				else if ( N_ROOT > 1 )
 					bounds.scale( RefineFac );
-				if ( N_ROOT < 0 )
+				else if ( N_ROOT < 0 )
 					throw std::logic_error( "Cannot find roots of non-holomorphic functions" );
+				else if ( N_ROOT == 1 )
+					break;
 			}
 
 			if ( N_ROOT == 1 )
@@ -98,13 +126,15 @@ namespace RootFinder {
 				auto roots = FindWithin( bounds, F, tol );
 				Complex root = roots.front();
 				RootList.emplace_back( root, alpha );
-				// Move box to be centred on the new root
-				bounds.recentre( root );
 			}
 			else
 			{
+				std::cerr << "Old root was " << RootList.rbegin()->first << " at alpha = " << RootList.rbegin()->second << ";" << std::endl;
+				std::cerr << "New alpha is " << alpha << " and we are now looking in " << bounds; 
 				throw std::logic_error( "Cannot adjust box to only contain new root -- parameter step is likely too large" );
 			}
+
+			// std::cerr << " where we found the root " << RootList.back().first << std::endl;
 		}
 
 		return RootList;

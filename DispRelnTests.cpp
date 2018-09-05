@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <complex>
+#include <vector>
 #include <utility>
 
 #include <boost/test/unit_test.hpp>
@@ -47,6 +48,21 @@ BOOST_AUTO_TEST_CASE( gamma_function_test )
 		BOOST_TEST( g1 == g1_a );
 		BOOST_TEST( g2 == g2_a );
 		BOOST_TEST( g3 == g3_a );
+	}
+
+	// k rho ~ = 45 => alpha ~= 1000. so check we're good up to alpha of 5000 (and ky rho of 100)
+	std::vector< double > LargeValues{ 250.0, 500.0, 750.0, 1000.0, 5000.0 };
+	// ExpBessel<0> of these values, as determined by mathematica 
+	std::vector< double > EB0Vals{0.025243969387054753633,0.017845706500153167237,0.014569742116743979078,0.012617240455891256586,0.0056420368987445886570};
+	std::vector< double > EB1Vals{0.025193430757117305262,0.017827851852898056461,0.014560025713286366714,0.012610930256928629470,0.0056414726668388859036};
+	for ( unsigned int i=0; i<LargeValues.size(); ++i )
+	{
+		double x = LargeValues[ i ];
+		double eb0 = DispReln::ExpBessel<0>( x );
+		double eb1 = DispReln::ExpBessel<1>( x );
+		
+		BOOST_TEST( eb0 == EB0Vals[ i ] );
+		BOOST_TEST( eb1 == EB1Vals[ i ] );
 	}
 }
 

@@ -32,8 +32,20 @@ namespace DispReln {
 			{ "kx", ScanTypes::kx },
 			{ "ky", ScanTypes::ky },
 			{ "fprim", ScanTypes::fprim },
-			{ "tprim", ScanTypes::tprim }
+			{ "tprim", ScanTypes::tprim },
+			{ "beta_ref", ScanTypes::beta }
 		};
+
+		static const std::map< std::string, Normalization > NormMap{
+			{ "default", Normalization::Default },
+			{ "ref", Normalization::Default },
+			{ "Alfven", Normalization::Alfven },
+			{ "alfven", Normalization::Alfven },
+			{ "kpar", Normalization::kRef },
+			{ "kpar_va", Normalization::kAlfven }
+		};
+
+
 
 		static const std::map< std::string, PhysicsTypes> PhysicsMap{
 			{ "gkslab", PhysicsTypes::GKSlab },
@@ -137,6 +149,7 @@ namespace DispReln {
 						throw std::invalid_argument( "Unknown Scanning Mode: " + type );
 
 					Scan badger_Scan( param, mode );
+					badger_Scan.beta = 0.0;
 					badger_Scan.sIndex = speciesIndex;
 					for ( auto &subtags : tags.second )
 					{
@@ -152,6 +165,8 @@ namespace DispReln {
 								else 
 								{
 									badger_Scan.fixed.emplace_back( it->second, std::stod( fix.second.data() ) );
+									if ( it->second == ScanTypes::beta )
+										badger_Scan.beta = std::stod( fix.second.data() );
 								}
 							}
 						}
@@ -170,10 +185,28 @@ namespace DispReln {
 							lower_s >> badger_Scan.box.lower;
 							upper_s >> badger_Scan.box.upper;
 						}
+						else if ( subtags.first == "output" )
+						{
+							std::string normalize_str = subtags.second.get( "<xmlattr>.normalization", "default" );
+							auto it = NormMap.find( normalize_str );
+							if ( it == NormMap.end() )
+								throw std::invalid_argument( "Unknown output normalization " + normalize_str );
+							else
+								badger_Scan.normalization = it->second;
+						}
+						else if ( subtags.first == "<xmlattr>" )
+						{
+							continue;
+						}
+						else
+						{
+							throw std::invalid_argument( "Unknown tag " + subtags.first + " in configuration file." );
+						}
 					}
 
 					badger_Scan.values.sort();
-					badger_Scan.values.unique();
+					double tol=1e-14;
+					badger_Scan.values.unique( [ = ]( double x, double y ){ return ( std::abs( x - y ) < tol );});
 
 					Scans.push_back( badger_Scan );
 

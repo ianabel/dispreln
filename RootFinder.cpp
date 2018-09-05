@@ -38,8 +38,7 @@ int WindingNumber( Path C, unsigned int N )
 		if ( delta > 0.25  )
 		{
 			increment *= .5;
-			r = s + increment;
-			Cr = C( r );
+			continue;
 		}
 		else if ( delta < .005 )
 		{
