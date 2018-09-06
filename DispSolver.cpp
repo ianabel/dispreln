@@ -147,7 +147,7 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 }
 
 template<typename T> void OutputScan( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results );
-template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results )
+template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan const& scan, DispReln::ElectrostaticSlab physics, std::list< std::pair<Complex,Real> > scan_results )
 {
 	std::cout << Header( scan ) << std::endl;
 
@@ -174,7 +174,7 @@ template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan 
 
 }
 
-template<> void OutputScan<DispReln::GKSlab>( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results )
+template<> void OutputScan<DispReln::GKSlab>( DispReln::Config::Scan const& scan, DispReln::GKSlab physics, std::list< std::pair<Complex,Real> > scan_results )
 {
 	std::cout << Header( scan ) << std::endl;
 
@@ -215,7 +215,7 @@ template<typename T> int RunAllScans( std::list<DispReln::Config::Scan> ScanList
 	{
 		std::list< std::pair<Complex,Real> > scan_results;
 		scan_results = PerformScan( S, physics );
-		OutputScan( S, scan_results );
+		OutputScan( S, physics, scan_results );
 	}
 	return 0;
 }
