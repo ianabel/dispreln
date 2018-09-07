@@ -255,23 +255,23 @@ namespace DispReln {
 				{
 					Complex xi_s = x.vt*xi;
 
-					/*
 					A += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
 					B += ( x.boltz/x.vt ) * ( xi_s  - ( xi_s - x.om_star )*Gamma<1,0,0>( x.alpha ) + x.om_star_t*( Gamma<3,0,0>( x.alpha ) + 0.5*Gamma<1,0,0>( x.alpha ) ) );
 					C += ( x.s.Z * x.s.Density ) * ( ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<2,1,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<4,1,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<2,1,0>( x.alpha ) ) );
-					D += ( x.s.Temperature * x.s.Density ) * ( -( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<3,1,1>( x.alpha ) + x.om_star_t*( Zeta<0>( xi_s )*Gamma<5,1,1>( x.alpha ) + Zeta<2>( xi_s )*Gamma<3,1,1>( x.alpha ) ) );
+					D += ( x.s.Temperature * x.s.Density ) * ( ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<3,1,1>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<5,1,1>( x.alpha ) + Zeta<2>( xi_s )*Gamma<3,1,1>( x.alpha ) ) );
 					E += ( x.s.Z/x.vt ) * ( ( xi_s - x.om_star )*Gamma<2,1,0>( x.alpha ) - x.om_star_t*( Gamma<4,1,0>( x.alpha ) + 0.5*Gamma<2,1,0>( x.alpha ) ) );
-					*/
 
+					/*
 					A += ( x.boltz )*( 1.0 + xi_s*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) );
-					B += ( x.boltz ) * ( 1.0  - Gamma<1,0,0>( x.alpha ) );
+					B += ( x.boltz/x.vt ) * ( xi_s  - xi_s*Gamma<1,0,0>( x.alpha ) );
 					C += ( x.s.Z * x.s.Density ) * ( xi_s*Zeta<0>( xi_s )*Gamma<2,1,0>( x.alpha ) );
 					D += ( x.s.Temperature * x.s.Density ) * ( xi_s*Zeta<0>( xi_s )*Gamma<3,1,1>( x.alpha ) );
-					E += ( x.s.Z ) * ( Gamma<2,1,0>( x.alpha ) );
+					E += ( x.s.Z/x.vt ) * ( xi_s* Gamma<2,1,0>( x.alpha ) );
+					*/
 
 				}
 
-				return  ( A*alpha_ref/( xi*xi*beta_ref ) - A*B + B*B )*( 2.0*A/beta_ref - A*D + C*C) - (A*E + B*C)*(A*E + B*C);
+				return  ( A*alpha_ref/( beta_ref ) - xi*A*B + B*B )*( 2.0*A/beta_ref - A*D + C*C) - (A*E + B*C)*(A*E + B*C);
 			}
 			void set_kpar( double kp ){_kpar = kp;recalculate();};
 			void set_kx( double kx ){_kx= kx;recalculate();};
@@ -338,12 +338,33 @@ namespace DispReln {
 
 	class EdgeSlab {
 		public:
-			EdgeSlab( std::list<Species> const & spec_list )
+			EdgeSlab( std::list<Species> const & spec_list, double beta )
 			{
 				SpeciesList.clear();
 				for ( auto i : spec_list )
 					SpeciesList.emplace_back( i );
 				_kpar = 1.0; _kx=0; _ky=0;
+				beta_ref = beta;
+				recalculate();
+			}
+
+			EdgeSlab( std::vector<Species> const & spec_list, double beta )
+			{
+				SpeciesList.clear();
+				for ( auto i : spec_list )
+					SpeciesList.emplace_back( i );
+				_kpar = 1.0; _kx=0; _ky=0;
+				beta_ref = beta;
+				recalculate();
+			}
+
+			EdgeSlab( std::initializer_list<Species> const & spec_list, double beta )
+			{
+				SpeciesList.clear();
+				for ( auto i : spec_list )
+					SpeciesList.emplace_back( i );
+				_kpar = 1.0; _kx=0; _ky=0;
+				beta_ref = beta;
 				recalculate();
 			}
 
@@ -351,21 +372,15 @@ namespace DispReln {
 			{
 				// _ky & _kx come normalized to rho_ref
 				// k_|| normalized to a;
-				Complex D( 0.0, 0.0 );
+				Complex A( 0.0, 0.0 ),B( 0.0, 0.0 );
 				for ( auto x : SpeciesList )
 				{
-					if ( x.s.mass == 0.0 )
-					{
-						D += x.boltz;
-						continue;
-					}
 
 					Complex xi_s = x.vt*xi;
-					
-					D += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
-
+					A += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
+					B += ( x.boltz/x.vt ) * ( xi_s  - ( xi_s - x.om_star )*Gamma<1,0,0>( x.alpha ) + x.om_star_t*( Gamma<3,0,0>( x.alpha ) + 0.5*Gamma<1,0,0>( x.alpha ) ) );
 				}
-				return D;
+				return ( A*alpha_ref/( xi*xi*beta_ref ) - A*B + B*B );
 			}
 			void set_kpar( double kp ){_kpar = kp;recalculate();};
 			void set_kx( double kx ){_kx= kx;recalculate();};
@@ -389,12 +404,13 @@ namespace DispReln {
 
 			void recalculate()
 			{
+				alpha_ref = ( _ky*_ky + _kx*_kx )/2.0;
 				for ( auto &x : SpeciesList ) 
 				{
 					x.s.rho = ::sqrt( x.s.Temperature * x.s.mass )/::abs( x.s.Z );
 					x.om_star = ( x.s.Z / ::abs ( x.s.Z ) )*0.5 * _ky * x.s.rho * x.s.fprim /  _kpar;
 					x.om_star_t = ( x.s.Z / ::abs ( x.s.Z ) )*0.5 * _ky * x.s.rho * x.s.tprim /  _kpar;
-					x.alpha = ( _ky*_ky + _kx*_kx )*( x.s.rho * x.s.rho )/2.0;
+					x.alpha = alpha_ref*( x.s.rho * x.s.rho );
 					x.vt = ::sqrt( x.s.mass / x.s.Temperature );
 					x.boltz = x.s.Z * x.s.Z * x.s.Density / x.s.Temperature;
 				}
@@ -406,20 +422,24 @@ namespace DispReln {
 				: SpeciesList( other.SpeciesList )
 			{
 				_kpar = other._kpar; _kx = other._kx; _ky = other._ky;
+				beta_ref = other.beta_ref;
 				recalculate();
 			};
 			EdgeSlab()
 			{
-				SpeciesList.reserve( 2 );
-				SpeciesList.emplace_back( Species( 1.0, 1.0, 1.0, 1.0, 0.0, 0.0 ) );
-				SpeciesList.emplace_back( Species( 1.0, 1.0, 1.0, 1.0, 0.0, 0.0 ) );
+				SpeciesList.clear();
 				_kpar = 0.0;
 				_ky = 0.0;
 				_kx = 0.0;
+				beta_ref = 0.0;
 			};
+			double beta_ref;
+			void set_beta(  double beta ) { beta_ref = beta;};
 		protected:
 			double _kpar,_kx,_ky;
+			double alpha_ref;
 
 	};
+
 }
 #endif // DISPRELN_H
