@@ -1,7 +1,7 @@
 
 <gkslab beta_ref="1.0">
 	<species Temperature="1.0" Density="1.0" Charge="1.0" Mass="1.0" fprim="0.0" tprim="0.0"/>
-	<species Temperature="1.0" Density="1.0" Charge="-1.0" Mass="0.000548579909" fprim="0.0" tprim="0.0"/>
+	<species Temperature="0.01" Density="1.0" Charge="-1.0" Mass="0.000548579909" fprim="0.0" tprim="0.0"/>
 </gkslab>
 
 <scan parameter="ky" type="TrackRoot">
@@ -28,7 +28,7 @@
 	</range>
 </scan>
 
-<scan parameter="ky" type="TrackRoot">
+<scan parameter="ky" type="TrackRoot" tol="1e-6">
 	<fixed kpar="1.0" kx="0.0" beta_ref="0.1"/>
 	<output normalization="alfven"/>
 	<box>
@@ -76,7 +76,7 @@
 	</range>
 </scan>
 
-<scan parameter="ky" type="TrackRoot">
+<scan parameter="ky" type="TrackRoot" tol="1e-6">
 	<fixed kpar="1.0" kx="0.0" beta_ref="0.01"/>
 	<output normalization="alfven"/>
 	<box>

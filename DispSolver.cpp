@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <complex>
 #include <utility>
+#include <deque>
+#include <list>
 
 #include <boost/program_options.hpp>
 #include <boost/math/constants/constants.hpp>
@@ -15,17 +17,12 @@
 
 using Complex = std::complex<double>;
 using Real = double;
+using RootPair = std::pair< Complex, Real >;
+using RootList_t = std::deque< RootPair >;
 
-std::ostream& operator<<( std::ostream& os, std::pair< Complex, Real > p )
+std::ostream& operator<<( std::ostream& os, RootPair p )
 {
 	os << p.first << " " << p.second;
-	return os;
-}
-
-std::ostream& operator<<( std::ostream& os, std::list<std::pair< Complex, Real >> l )
-{
-	for ( auto x : l )
-		os << x.second << "\t" << x.first.real() << "\t" << x.first.imag() << std::endl;
 	return os;
 }
 
@@ -76,21 +73,21 @@ std::string Footer( DispReln::Config::Scan const& Scan )
 	return "\n\n";
 }
 
-template<typename T> std::list<std::pair<Complex,Real> > DoScan( DispReln::Config::Scan MainScan, T scanner )
+template<typename T> std::deque<RootPair > DoScan( DispReln::Config::Scan MainScan, T scanner )
 {
 	switch ( MainScan.mode )
 	{
 		case DispReln::Config::ScanMode::TrackRoot:
-			return TrackRoot( MainScan.box, scanner, MainScan.values );
+			return TrackRoot( MainScan.box, scanner, MainScan.values, MainScan.tolerance );
 			break;
 		case DispReln::Config::ScanMode::MostUnstableMode:
-			return MostUnstableModes( MainScan.box, scanner, MainScan.values );
+			return MostUnstableModes( MainScan.box, scanner, MainScan.values, MainScan.tolerance );
 			break;
 	}
-	return std::list<std::pair<Complex,Real> >();
+	return std::deque<RootPair >();
 }
 
-template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::Config::Scan MainScan, T physics )
+template<typename T> std::deque<RootPair > PerformScan( DispReln::Config::Scan MainScan, T physics )
 {
 	for ( auto &f : MainScan.fixed )
 	{
@@ -113,7 +110,7 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 		}
 	}
 
-	std::list< std::pair< Complex, Real > > scan;
+	std::deque< RootPair > scan;
 
 	DispReln::ky_scanner<T> kyScan( physics );
 	DispReln::kpar_scanner<T> kparScan( physics );
@@ -146,8 +143,8 @@ template<typename T> std::list<std::pair<Complex,Real> > PerformScan( DispReln::
 	return scan;
 }
 
-template<typename T> void OutputScan( DispReln::Config::Scan const& scan, T physics, std::list< std::pair<Complex,Real> > scan_results );
-template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan const& scan, DispReln::ElectrostaticSlab physics, std::list< std::pair<Complex,Real> > scan_results )
+template<typename T> void OutputScan( DispReln::Config::Scan const& scan, T physics, RootList_t scan_results );
+template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan const& scan, DispReln::ElectrostaticSlab physics, RootList_t scan_results )
 {
 	std::cout << Header( scan ) << std::endl;
 
@@ -174,7 +171,7 @@ template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan 
 
 }
 
-template<> void OutputScan<DispReln::GKSlab>( DispReln::Config::Scan const& scan, DispReln::GKSlab physics, std::list< std::pair<Complex,Real> > scan_results )
+template<> void OutputScan<DispReln::GKSlab>( DispReln::Config::Scan const& scan, DispReln::GKSlab physics, RootList_t scan_results )
 {
 	std::cout << Header( scan ) << std::endl;
 
@@ -213,7 +210,7 @@ template<typename T> int RunAllScans( std::list<DispReln::Config::Scan> ScanList
 {
 	for ( auto &S : ScanList )
 	{
-		std::list< std::pair<Complex,Real> > scan_results;
+		RootList_t scan_results;
 		scan_results = PerformScan( S, physics );
 		OutputScan( S, physics, scan_results );
 	}

@@ -148,9 +148,14 @@ namespace DispReln {
 					else
 						throw std::invalid_argument( "Unknown Scanning Mode: " + type );
 
+					double Tolerance = tags.second.get( "<xmlattr>.tol", 0.001 );
+
+					
+
 					Scan badger_Scan( param, mode );
 					badger_Scan.beta = 0.0;
 					badger_Scan.sIndex = speciesIndex;
+					badger_Scan.tolerance = Tolerance;
 					for ( auto &subtags : tags.second )
 					{
 						if ( subtags.first == "val" )

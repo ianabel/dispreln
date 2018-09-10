@@ -34,17 +34,18 @@ int WindingNumber( Path C, unsigned int N )
 
 		Complex Cs = C( s ),Cr = C( r );
 
-		Real delta = ::abs( Cr - Cs ) / ::abs( Cr );
-		if ( delta > 0.25  )
+		Real aCr = std::arg( Cr ), aCs = std::arg( Cs );
+		Real pi_over_2 = 1.57079632679489661922;
+		Real pi_over_8 = .39269908169872415480;
+		if ( delta > pi_over_2  )
 		{
 			increment *= .5;
 			continue;
 		}
-		else if ( delta < .005 )
+		else if ( delta < pi_over_8 )
 		{
 			increment *= 1.5;
-			r = s + increment;
-			Cr = C( r );
+			continue;
 		}
 
 		if ( std::abs( Cs ) < 1e-100 )
@@ -94,6 +95,41 @@ Path RectangleImage( Complex a, Complex b, Func const & f )
 		else
 			return f( a );
 	};
+}
+
+Path Image( Simplex const& T, Func const & f )
+{
+	return [ = ]( Real s ) {
+		if ( 0.0 < s && s <= 1./3. )
+			return f( ( 1. - 3.*s )*T[ 0 ] + 3.*s*T[ 1 ] );
+		else if ( 1./3. < s && s <= 2./3. )
+			return f( ( 2. - 3.*s )*T[ 1 ] + ( 3.*s - 1. )*T[ 2 ] );
+		else if ( 2./3. < s && s <= 1.0 )
+			return f( ( 3. - 3.*s )*T[ 2 ] + ( 3.*s - 2. )*T[ 0 ] );
+		else
+			return f( T[ 0 ] );
+	};
+}
+
+Simplex Simplex::Extend( Simplex T, Complex x )
+{
+	if ( T.inside( x ) )
+		throw std::invalid_argument( "Cannot do that Captain!" );
+	if ( std::abs( T[ 0 ] - x ) > std::abs( T[ 1 ] - x ) )
+	{
+		if ( std::abs( T[ 0 ] - x ) > std::abs( T[ 2 ] - x ) ) 
+			return Simplex( T[ 1 ], T[ 2 ], x );
+		else
+			return Simplex( T[ 0 ], T[ 1 ], x );
+	}
+	else
+	{
+		if ( std::abs( T[ 1 ] - x ) > std::abs( T[ 2 ] - x ) ) 
+			return Simplex( T[ 0 ], T[ 2 ], x );
+		else
+			return Simplex( T[ 0 ], T[ 1 ], x );
+	}
+	// Cannot reach.
 }
 
 Path RectangleImage( RootBoundingBox const & b, Func const& f )

@@ -29,10 +29,10 @@ namespace DispReln {
 			RootFinder::RootBoundingBox box;
 			unsigned int sIndex;
 			Normalization normalization;
-			double beta;
-			Scan( ScanTypes x, ScanMode y ) { parameter = x; mode = y; values.clear(); fixed.clear();};
+			double beta,tolerance;
+			Scan( ScanTypes x, ScanMode y ) { parameter = x; mode = y; values.clear(); fixed.clear(); beta = 0.0; tolerance = 1e-3;};
 			Scan( Scan const& o ) : parameter( o.parameter ), mode( o.mode ), values( o.values ), fixed( o.fixed ), 
-											box( o.box ), sIndex( o.sIndex ), normalization( o.normalization ), beta( o.beta ) {};
+											box( o.box ), sIndex( o.sIndex ), normalization( o.normalization ), beta( o.beta ), tolerance( o.tolerance ) {};
 		};
 
 		std::list<Scan> GenerateScans( std::string const& filename );

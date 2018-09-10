@@ -3,16 +3,20 @@
 
 #include <complex>
 #include <functional>
+#include <vector>
 
+#include <deque>
 #include <list>
 #include <iostream>
 #include <boost/math/constants/constants.hpp>
+#include <algorithm>
 
 
 namespace RootFinder {
 	using Real = double;
 	using Complex = std::complex<Real>;
 	static const Complex I( 0.0, 1.0 );
+	struct Simplex;
 
 	using Path = std::function< Complex( Real )>;
 	using Func = std::function< Complex( Complex )>;
@@ -20,6 +24,7 @@ namespace RootFinder {
 	int WindingNumber( Path, unsigned int N=400 );
 	Path Rectangle( Complex lower, Complex upper );
 	Path RectangleImage( Complex a, Complex b, Func const & f );
+	Path Image( Simplex const &T, Func const & f );
 
 	struct RootBoundingBox {
 		Complex lower;
@@ -68,13 +73,14 @@ namespace RootFinder {
 	Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol = 1e-10 );
 	std::list<Complex> FindWithin( RootBoundingBox box, Func const& f, Real tol = 1e-6 );
 
-	template<typename T> std::list< std::pair<Complex,Real> > TrackRoot( RootBoundingBox Initial, T const& G, std::list<Real> params, Real tol = 1e-3 )
+	template<typename T> std::deque< std::pair<Complex,Real> > TrackRoot( RootBoundingBox Initial, T const& G, std::list<Real> params, Real tol = 1e-3 )
 	{
-		std::list< std::pair<Complex,Real> > RootList;
+		std::deque< std::pair<Complex,Real> > RootList;
 		RootBoundingBox bounds = Initial;
 		static unsigned int MAX_REFINE = 20;
-		static Real RefineFac = 0.75;
+		// static Real RefineFac = 0.75;
 		static Real ExpandFac = 1.25;
+		Real size_lim = 2.0*std::abs( Initial.diag() );
 		RootList.clear();
 
 		for ( auto alpha : params )
@@ -83,27 +89,21 @@ namespace RootFinder {
 			F.set_param( alpha );
 
 			int N_ROOT = -1;
-			// Move box to be centred on a guess at the next root
-			if ( RootList.size() >= 2 ) {
-				/*
-				// Linear extrapolation
-				auto old_soln = RootList.rbegin();
-				auto older_soln = --RootList.rbegin();
-				Complex old_root = old_soln->first;
-				Complex older_root = older_soln->first;
-				Real old_alpha = old_soln->second;
-				Real older_alpha = older_soln->second;
-				Complex rootGuess = old_root + ( alpha - old_alpha )*( old_root - older_root )/( old_alpha - older_alpha );
-				bounds.recentre( rootGuess );
-				*/
-				bounds.recentre( RootList.rbegin()->first );
-				if ( abs( bounds.diag() ) > abs( Initial.diag() )*2.0 )
+			// Move box to be centred on the last root.
+			bounds.recentre( RootList.rbegin()->first );
+			if ( abs( bounds.diag() ) > size_lim )
 					bounds.scale( 0.5 );
-			} else if ( RootList.size() == 1 ) {
-				// Only have one data point, so just centre on that
-				bounds.recentre( RootList.rbegin()->first );
-			} else {
-				bounds = Initial;
+
+			Complex delta_guess,root_guess;
+			if ( RootList.size() > 2 )
+			{
+				auto rn1 = RootList[ RootList.size() - 1 ];
+				auto rn2 = RootList[ RootList.size() - 2 ];
+
+				delta_guess = ( alpha - rn1.second )*( rn1.first - rn2.first )/( rn1.second - rn2.second );
+				// recentre?
+				root_guess =bounds.centre() + delta_guess;
+				bounds.recentre( root_guess );
 			}
 				
 			// std::cerr << "New alpha is " << alpha << " and we are now looking in " << bounds; 
@@ -113,28 +113,30 @@ namespace RootFinder {
 				N_ROOT = WindingNumber( RectangleImage( bounds, F ) );
 				if ( N_ROOT == 0 )
 					bounds.scale( ExpandFac );
-				else if ( N_ROOT > 1 )
-					bounds.scale( RefineFac );
 				else if ( N_ROOT < 0 )
 					throw std::logic_error( "Cannot find roots of non-holomorphic functions" );
-				else if ( N_ROOT == 1 )
+				else if ( N_ROOT >= 1 )
 					break;
 			}
-
-			if ( N_ROOT == 1 )
+			
+			if ( N_ROOT == 0 )
 			{
-				auto roots = FindWithin( bounds, F, tol );
-				Complex root = roots.front();
-				RootList.emplace_back( root, alpha );
-			}
-			else
-			{
-				std::cerr << "Old root was " << RootList.rbegin()->first << " at alpha = " << RootList.rbegin()->second << ";" << std::endl;
-				std::cerr << "New alpha is " << alpha << " and we are now looking in " << bounds; 
-				throw std::logic_error( "Cannot adjust box to only contain new root -- parameter step is likely too large" );
+				throw std::logic_error( "Could not expand the box enough to find a root. Has it disappeared?" );
 			}
 
-			// std::cerr << " where we found the root " << RootList.back().first << std::endl;
+
+			auto roots = FindWithin( bounds, F, tol );
+
+			roots.sort( [=]( Complex const& a, Complex const& b ){ return ( std::abs( a - root_guess )  < std::abs( b - root_guess ) ); } );
+
+			Complex root = roots.front();
+
+			if ( std::abs( N_ROOT ) != roots.size() )
+			{
+				std::cerr << "Possible root crossing at alpha = " << alpha << " and root location " << root << std::endl;
+			}
+
+			RootList.emplace_back( root, alpha );
 		}
 
 		return RootList;
@@ -148,11 +150,11 @@ namespace RootFinder {
 			return false;
 	}
 
-	template<typename T> std::list< std::pair< Complex, Real > > MostUnstableModes( RootBoundingBox Initial, T const& G, std::list<Real> parameters, Real tol = 1e-3 )
+	template<typename T> std::deque< std::pair< Complex, Real > > MostUnstableModes( RootBoundingBox Initial, T const& G, std::list<Real> parameters, Real tol = 1e-3 )
 	{
 		RootBoundingBox box = Initial;
 		Real centre_in_omega = box.centre().real();
-		std::list< std::pair< Complex, Real > > RootList;
+		std::deque< std::pair< Complex, Real > > RootList;
 
 		for ( auto alpha : parameters ) 
 		{
@@ -170,6 +172,45 @@ namespace RootFinder {
 		}
 		return RootList;
 	}
+
+	struct Simplex {
+		Simplex( Complex a, Complex b, Complex c ) {
+			vertices.reserve( 3 );
+			vertices[ 0 ] = a;
+			vertices[ 1 ] = b;
+			vertices[ 2 ] = c;
+			Complex bc = ( a + b + c )/3.0;
+			std::sort( vertices.begin(), vertices.end(), [=]( Complex x, Complex y ){ return ( std::arg( x - bc ) < std::arg( y - bc ) );} );
+		}
+		Simplex( Simplex const& other )
+		{
+			for ( unsigned int i=0; i<3; i++ )
+				vertices[ i ] = other.vertices[ i ];
+		}
+
+		Simplex Extend( Simplex, Complex );
+		Complex centre() { return ( vertices[ 0 ] + vertices[ 1 ] + vertices[ 2 ] )/ 3.0;}
+		bool inside( Complex x ) {
+			bool Side1,Side2,Side3;
+			Side1 = ( ( ( x - vertices[ 0 ] )*( vertices[ 1 ] - vertices[ 0 ] ) ).real() >=0 );
+			Side2 = ( ( ( x - vertices[ 0 ] )*( vertices[ 1 ] - vertices[ 0 ] ) ).real() >=0 );
+			Side3 = ( ( ( x - vertices[ 0 ] )*( vertices[ 1 ] - vertices[ 0 ] ) ).real() >=0 );
+			return Side1 && Side2 && Side3;
+		}
+
+		Complex operator[]( unsigned int i ) const
+		{
+			return vertices[ i ];
+		}
+
+		Complex& operator[]( unsigned int i )
+		{
+			return vertices[ i ];
+		}
+		private:
+			std::vector<Complex> vertices;
+	};
+
 
 }
 #endif // ROOTFINDER_H
