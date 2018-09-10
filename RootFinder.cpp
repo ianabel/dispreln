@@ -34,18 +34,17 @@ int WindingNumber( Path C, unsigned int N )
 
 		Complex Cs = C( s ),Cr = C( r );
 
-		Real aCr = std::arg( Cr ), aCs = std::arg( Cs );
-		Real pi_over_2 = 1.57079632679489661922;
-		Real pi_over_8 = .39269908169872415480;
-		if ( delta > pi_over_2  )
+		Real delta = ::abs( Cr - Cs ) / ::abs( Cr );
+		if ( delta > 0.25  )
 		{
 			increment *= .5;
 			continue;
 		}
-		else if ( delta < pi_over_8 )
+		else if ( delta < .005 )
 		{
 			increment *= 1.5;
-			continue;
+			r = s + increment;
+			Cr = C( r );
 		}
 
 		if ( std::abs( Cs ) < 1e-100 )

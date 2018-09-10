@@ -33,7 +33,7 @@ std::ostream& operator<<( std::ostream& os, std::list<Complex> l )
 	return os;
 }
 
-std::string Header( DispReln::Config::Scan const& Scan )
+std::string Header( DispReln::Config::Scan const& Scan, bool want_col_header = true )
 {
 	std::ostringstream out( "" );
 	std::string col_header;
@@ -64,7 +64,8 @@ std::string Header( DispReln::Config::Scan const& Scan )
 			break;
 	}
 
-	out << col_header << std::endl;
+	if ( want_col_header ) 
+		out << col_header << std::endl;
 	return out.str();
 }
 
@@ -159,6 +160,7 @@ template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan 
 			norm = physics.get_kpar();
 			break;
 		default:
+			std::cerr << ( unsigned int )scan.normalization << std::endl;
 			throw std::invalid_argument( "Attempting to use an Alfvenic normalization for an electrostatic run!" );
 			break;
 	}
@@ -218,6 +220,62 @@ template<typename T> int RunAllScans( std::list<DispReln::Config::Scan> ScanList
 }
 
 
+template<typename T> void ListScan( DispReln::Config::Scan const& scan, T const& physics )
+{
+	std::cout << Header( scan ) << std::endl;
+
+	double norm,beta;
+	norm = 1.0;
+
+	switch ( scan.normalization )
+	{
+		case DispReln::Config::Normalization::Default:
+			std::cout << "Frequencies and growth rates will be normalized to v_tref / L_ref" << std::endl;
+			break;
+		case DispReln::Config::Normalization::kRef:
+			std::cout << "Frequencies and growth rates will be normalized to k_|| v_tref" << std::endl;
+			break;
+		case DispReln::Config::Normalization::kAlfven:
+			std::cout << "Frequencies and growth rates will be normalized to k_|| v_A" << std::endl;
+		case DispReln::Config::Normalization::Alfven:
+			std::cout << "Frequencies and growth rates will be normalized to v_A / L_ref" << std::endl;
+			break;
+		default:
+			throw std::invalid_argument( "Unsupported Normalization" );
+			break;
+	}
+
+	std::cout << "The scan will be perofmed holding the following values fixed:" << std::endl;
+	std::map< DispReln::Config::ScanTypes, std::string > outfixed{
+		{ DispReln::Config::ScanTypes::kpar, "k_||" },
+		{ DispReln::Config::ScanTypes::kx, "k_x" },
+		{ DispReln::Config::ScanTypes::ky, "k_y" },
+		{ DispReln::Config::ScanTypes::beta, "beta" },
+		{ DispReln::Config::ScanTypes::fprim, "L_ref/L_n" },
+		{ DispReln::Config::ScanTypes::tprim, "L_ref/L_T" },
+	};
+
+	for ( auto &x : scan.fixed )
+		std::cout << outfixed[ x.first ] << " = " << x.second << std::endl;
+
+	std::cout << "The scan will range over the following values of " << outfixed[ scan.parameter ] << std::endl;
+	std::cout << "\t{ ";
+	for ( auto &x : scan.values )
+		std::cout << x << ", ";
+	std::cout << "}" << std::endl;
+
+	std::cout << Footer( scan ) << std::endl;
+}
+
+
+template<typename T> int ListScans( std::list<DispReln::Config::Scan> ScanList, T physics )
+{
+	for ( auto &S : ScanList )
+	{
+		ListScan( S, physics );
+	}
+	return 0;
+}
 
 
 namespace po = boost::program_options;
@@ -241,11 +299,37 @@ int main( int argc, char** argv )
 		config_file = vm[ "config-file" ].as<std::string>();
 	}
 
+	bool Simulate = false;
+	if ( vm.count( "simulate" ) )
+	{
+		Simulate = true;
+	}
 
 	DispReln::Config::PhysicsTypes physics = DispReln::Config::GetPhysicsModel( config_file );
 	auto scans = DispReln::Config::GenerateScans( config_file );
 	DispReln::GKSlab FullSlab;
 	DispReln::ElectrostaticSlab ESSlab;
+
+	if ( Simulate )
+	{
+		switch ( physics )
+		{
+			case DispReln::Config::PhysicsTypes::GKSlab:
+				FullSlab =  DispReln::Config::ReadConfig<DispReln::GKSlab>( config_file );
+				std::cout << "# Solutions to the full gyrokinetic dispersion relation in a slab" << std::endl;
+				return ListScans( scans, FullSlab );
+				break;
+			case DispReln::Config::PhysicsTypes::ElectrostaticSlab:
+				ESSlab =  DispReln::Config::ReadConfig<DispReln::ElectrostaticSlab>( config_file );
+				std::cout << "# Solutions to the electrostatic gyrokinetic dispersion relation in a slab" << std::endl;
+				return ListScans( scans, ESSlab );
+				break;
+			default:
+				std::cerr << "Config file specifies an invalid physics model" << std::endl;
+				return -1;
+				break;
+		}
+	}
 
 	switch ( physics )
 	{

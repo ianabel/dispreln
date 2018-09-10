@@ -78,7 +78,6 @@ namespace RootFinder {
 		std::deque< std::pair<Complex,Real> > RootList;
 		RootBoundingBox bounds = Initial;
 		static unsigned int MAX_REFINE = 20;
-		// static Real RefineFac = 0.75;
 		static Real ExpandFac = 1.25;
 		Real size_lim = 2.0*std::abs( Initial.diag() );
 		RootList.clear();
@@ -90,9 +89,12 @@ namespace RootFinder {
 
 			int N_ROOT = -1;
 			// Move box to be centred on the last root.
-			bounds.recentre( RootList.rbegin()->first );
-			if ( abs( bounds.diag() ) > size_lim )
+			if ( RootList.size() > 0 )
+			{
+				bounds.recentre( RootList.rbegin()->first );
+				if ( abs( bounds.diag() ) > size_lim )
 					bounds.scale( 0.5 );
+			}
 
 			Complex delta_guess,root_guess;
 			if ( RootList.size() > 2 )
@@ -108,20 +110,27 @@ namespace RootFinder {
 				
 			// std::cerr << "New alpha is " << alpha << " and we are now looking in " << bounds; 
 
+			unsigned int n_points = 400;
 			for ( unsigned i=0; N_ROOT != 1 && i < MAX_REFINE; i++ )
 			{
-				N_ROOT = WindingNumber( RectangleImage( bounds, F ) );
+				N_ROOT = WindingNumber( RectangleImage( bounds, F ), n_points );
 				if ( N_ROOT == 0 )
 					bounds.scale( ExpandFac );
 				else if ( N_ROOT < 0 )
-					throw std::logic_error( "Cannot find roots of non-holomorphic functions" );
+				{
+					n_points *= 2;
+					if ( n_points > 16000 )
+						break;
+				}
 				else if ( N_ROOT >= 1 )
 					break;
 			}
 			
-			if ( N_ROOT == 0 )
+			if ( N_ROOT <= 0 )
 			{
-				throw std::logic_error( "Could not expand the box enough to find a root. Has it disappeared?" );
+				// throw std::logic_error( "Could not expand the box enough to find a root. Has it disappeared?" );
+				std::cerr << "Scan terminated prematurely at alpha = " << alpha << std::endl;
+				break;
 			}
 
 

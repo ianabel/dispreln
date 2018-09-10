@@ -13,7 +13,7 @@ namespace DispReln {
 		enum struct ScanTypes { kpar, kx, ky, fprim, tprim, beta, Invalid = 255 };
 		enum struct PhysicsTypes { GKSlab, ElectrostaticSlab, EdgeSlab, Invalid = 255 };
 		enum struct ScanMode { TrackRoot, MostUnstableMode };
-		enum struct Normalization { Default, Alfven, kRef, kAlfven };
+		enum struct Normalization { Default = 1, Alfven, kRef, kAlfven, Invalid = 255 };
 
 		template<typename T> T ReadConfig( std::string const& );
 		template<> DispReln::GKSlab ReadConfig( std::string const& );

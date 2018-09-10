@@ -156,6 +156,8 @@ namespace DispReln {
 					badger_Scan.beta = 0.0;
 					badger_Scan.sIndex = speciesIndex;
 					badger_Scan.tolerance = Tolerance;
+					badger_Scan.normalization = Normalization::Default;
+
 					for ( auto &subtags : tags.second )
 					{
 						if ( subtags.first == "val" )
