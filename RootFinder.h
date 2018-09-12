@@ -33,7 +33,31 @@ namespace RootFinder {
 
 		RootBoundingBox() : lower( 0.0 ), upper( 0.0 ), Index( 0 ) {};
 		RootBoundingBox( RootBoundingBox const& rb ) : lower( rb.lower ), upper( rb.upper ), Index( rb.Index ) {};
-		RootBoundingBox( Complex a, Complex b, unsigned int i ) : lower( a ), upper( b ), Index( i ) {};
+		RootBoundingBox( Complex a, Complex b, unsigned int i ) : Index( i ) {
+			if ( a.real() < b.real() )
+			{
+				lower.real(a.real());
+				upper.real(b.real());
+
+			}
+			else
+			{
+				lower.real(b.real());
+				upper.real(a.real());
+			}
+
+			if ( a.imag() < b.imag() )
+			{
+				lower.imag(a.imag());
+				upper.imag(b.imag());
+
+			}
+			else
+			{
+				lower.imag(b.imag());
+				upper.imag(a.imag());
+			}
+		};
 		friend std::ostream& operator<<( std::ostream& os, const RootBoundingBox& Box ) {
 			os << "[" << Box.lower << "," << Box.upper << "]";
 			return os;
@@ -42,6 +66,9 @@ namespace RootFinder {
 		Complex centre() const { return ( lower + upper )/2.0; };
 		Complex diag() const { return ( lower - upper )/2.0; };
 
+		bool contains( Complex x ) {
+			return ( x.real() > lower.real() && x.real() < upper.real() ) && ( x.imag() > lower.imag() && x.imag() < upper.imag() );
+		}
 
 		void scale( Real fac )
 		{

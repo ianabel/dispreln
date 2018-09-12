@@ -64,6 +64,21 @@ std::string Header( DispReln::Config::Scan const& Scan, bool want_col_header = t
 			break;
 	}
 
+	out << "# The scan will be perofmed holding the following values fixed:" << std::endl;
+	std::map< DispReln::Config::ScanTypes, std::string > outfixed{
+		{ DispReln::Config::ScanTypes::kpar, "k_||" },
+		{ DispReln::Config::ScanTypes::kx, "k_x" },
+		{ DispReln::Config::ScanTypes::ky, "k_y" },
+		{ DispReln::Config::ScanTypes::beta, "beta" },
+		{ DispReln::Config::ScanTypes::fprim, "L_ref/L_n" },
+		{ DispReln::Config::ScanTypes::tprim, "L_ref/L_T" },
+	};
+
+	for ( auto &x : Scan.fixed )
+		out << "# " << outfixed[ x.first ] << " = " << x.second << std::endl;
+
+
+
 	if ( want_col_header ) 
 		out << col_header << std::endl;
 	return out.str();
@@ -224,8 +239,6 @@ template<typename T> void ListScan( DispReln::Config::Scan const& scan, T const&
 {
 	std::cout << Header( scan ) << std::endl;
 
-	double norm,beta;
-	norm = 1.0;
 
 	switch ( scan.normalization )
 	{

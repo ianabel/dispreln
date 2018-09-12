@@ -31,10 +31,69 @@ Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol )
 	// Shouldn't need more than 10 steps.
 	unsigned int MAX_ITER = 40;
 	unsigned int i;
+	std::list<Complex> u_list;
 	for ( i=0; i<MAX_ITER; i++ )
 	{
+		if ( std::abs( fprimez ) < 1e-10 )
+		{
+			break;
+		}
 		// Compute next point
 		u = z - fz/fprimez;
+		if ( box.contains( u ) )
+			u_list.push_back( u );
+		else
+		{
+			// go to the box edge along -fz/fprime_z
+			Real theta_u = std::arg( box.upper - z );
+			Real theta_l = std::arg( box.lower - z );
+
+			Complex ul( box.lower.real(), box.upper.imag() );
+			Complex lr( box.upper.real(), box.lower.imag() );
+			Real theta_ul = std::arg( ul - z );
+			Real theta_lr = std::arg( lr - z );
+
+	
+			Real alpha = std::arg( u - z );
+
+			Real Lambda;
+
+			if ( alpha > theta_u && alpha <= theta_ul )
+			{
+				// Through top edge
+				Lambda = ( box.upper.imag() - z.imag() )/( ( -fz/fprimez ).imag() );
+			}
+			else if ( alpha <= theta_u && alpha > theta_lr )
+			{
+				// Right edge
+				Lambda = ( box.upper.real() - z.real() )/( ( -fz/fprimez ).real() );
+			}
+			else if ( alpha <= theta_lr && alpha > theta_l )
+			{
+				// Bottom edge
+				Lambda = ( box.lower.imag() - z.imag() )/( ( -fz/fprimez ).imag() );
+			}
+			else if ( alpha > theta_ul || alpha < theta_l )
+			{
+				// Left edge
+				Lambda = ( box.lower.real() - z.real() )/( ( -fz/fprimez ).real() );
+			}
+			else
+			{
+				throw std::logic_error( "WAT" );
+			}
+
+			if (  Lambda <= 0.0 || Lambda >= 1.0 )
+				throw std::logic_error( "WAT" );
+
+
+			u = z - Lambda*.99*fz/fprimez;
+			if ( box.contains( u ) )
+				u_list.push_back( u );
+			else
+				throw std::logic_error( "WAT" );
+		}
+
 		// Check for convergence
 		// if( |u-z| < tol * |z| ) we're done
 		if ( std::abs( u - z ) < tol*std::abs( z ) )
@@ -42,6 +101,8 @@ Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol )
 		// Compute an approximation to f'(u)
 		Complex fu = f( u );
 		fprimez = ( fu - fz )/( u - z );
+		if ( isnan( fu.real() ) || isnan( fu.imag() ) || isnan( fprimez.real() ) || isnan( fprimez.imag() ) )
+			throw std::logic_error( "Function to be solved returned a NaN!" );
 
 		// move from z -> u
 		z = u;
