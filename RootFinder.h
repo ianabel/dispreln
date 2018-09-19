@@ -137,7 +137,7 @@ namespace RootFinder {
 				
 			// std::cerr << "New alpha is " << alpha << " and we are now looking in " << bounds; 
 
-			unsigned int n_points = 400;
+			unsigned int n_points = 4000;
 			for ( unsigned i=0; N_ROOT != 1 && i < MAX_REFINE; i++ )
 			{
 				N_ROOT = WindingNumber( RectangleImage( bounds, F ), n_points );

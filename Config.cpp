@@ -187,10 +187,14 @@ namespace DispReln {
 						}
 						else if ( subtags.first == "box" )
 						{
+							Complex lower,upper;
 							std::istringstream lower_s( subtags.second.get<std::string>( "lower" ) );
 							std::istringstream upper_s( subtags.second.get<std::string>( "upper" ) );
-							lower_s >> badger_Scan.box.lower;
-							upper_s >> badger_Scan.box.upper;
+							lower_s >> lower;
+							upper_s >> upper;
+							RootFinder::RootBoundingBox Initial( lower, upper, 0 );
+							badger_Scan.box = Initial;
+
 						}
 						else if ( subtags.first == "output" )
 						{
