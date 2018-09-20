@@ -189,24 +189,6 @@ std::list< RootBoundingBox > RefineAll( std::list<RootBoundingBox> &Boxes, Func 
 	return Boxes;
 }
 
-std::list<Complex> FindWithin( RootBoundingBox box, Func const& f, Real tol )
-{
-	std::list<RootBoundingBox> grid;
-	box.Index = WindingNumber( RectangleImage( box, f ) );
 
-	grid.push_back( box );
-
-	// Bisect to get most of the work done
-	RefineAll( grid, f, ::sqrt( tol ) );
-
-	std::list<Complex> roots;
-
-	for ( auto& patch : grid )
-	{
-		roots.push_back( DirectSolve( patch, f, tol ) );
-	}
-
-	return roots;
-}
 
 }

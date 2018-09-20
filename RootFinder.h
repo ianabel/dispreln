@@ -98,7 +98,27 @@ namespace RootFinder {
 	std::list< RootBoundingBox > RefineAll( std::list<RootBoundingBox> & Boxes, Func const & f, Real tol = 0.01 );
 
 	Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol = 1e-10 );
-	std::list<Complex> FindWithin( RootBoundingBox box, Func const& f, Real tol = 1e-6 );
+	
+	template<typename T> T FindWithin( RootBoundingBox box, Func const& f, Real tol )
+	{
+		std::list<RootBoundingBox> grid;
+		box.Index = WindingNumber( RectangleImage( box, f ) );
+
+		grid.push_back( box );
+
+		// Bisect to get most of the work done
+		RefineAll( grid, f, ::sqrt( tol ) );
+
+		T roots;
+
+		for ( auto& patch : grid )
+		{
+			roots.push_back( DirectSolve( patch, f, tol ) );
+		}
+
+		return roots;
+	}
+
 
 	template<typename T> std::deque< std::pair<Complex,Real> > TrackRoot( RootBoundingBox Initial, T const& G, std::list<Real> params, Real tol = 1e-3 )
 	{
@@ -161,7 +181,7 @@ namespace RootFinder {
 			}
 
 
-			auto roots = FindWithin( bounds, F, tol );
+			auto roots = FindWithin< std::list<Complex> >( bounds, F, tol );
 
 			roots.sort( [=]( Complex const& a, Complex const& b ){ return ( std::abs( a - root_guess )  < std::abs( b - root_guess ) ); } );
 
@@ -198,13 +218,32 @@ namespace RootFinder {
 			T DispersionObject( G );
 			// Adjust it
 			DispersionObject.set_param( alpha );
-			auto roots = FindWithin( box, DispersionObject, 1e-3 );
+			auto roots = FindWithin< std::list<Complex> >( box, DispersionObject, tol );
 			if ( roots.size() == 0 )
 				throw std::logic_error( "Bad Box" );
 			roots.sort( MostUnstable );
 			Complex root = roots.front();
 			RootList.emplace_back( root, alpha );
 			box.recentre( centre_in_omega + root.imag() * I );
+		}
+		return RootList;
+	}
+
+	template<typename T> std::deque< std::pair< Complex, Real > > AllRoots( RootBoundingBox Initial, T const& G, std::list<Real> parameters, Real tol = 1e-3 )
+	{
+		RootBoundingBox box = Initial;
+		Real centre_in_omega = box.centre().real();
+		std::deque< std::pair< Complex, Real > > RootList;
+
+		for ( auto alpha : parameters ) 
+		{
+			// Copy the dispersion object
+			T DispersionObject( G );
+			// Adjust it
+			DispersionObject.set_param( alpha );
+			auto roots = FindWithin< std::list<Complex> >( box, DispersionObject, tol );
+			for ( auto const &r : roots )
+				RootList.emplace_back( r, alpha );
 		}
 		return RootList;
 	}
@@ -246,7 +285,6 @@ namespace RootFinder {
 		private:
 			std::vector<Complex> vertices;
 	};
-
 
 }
 #endif // ROOTFINDER_H

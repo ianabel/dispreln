@@ -117,9 +117,20 @@ namespace DispReln {
 				// There can be multiple scan tags
 				if ( tags.first == scan_tag )
 				{
-					ScanTypes param;
+					ScanTypes param = ScanTypes::Invalid;
 					ScanMode mode;
 					unsigned int speciesIndex = 0;
+
+					std::string type = tags.second.get<std::string>( "<xmlattr>.type" );
+					if ( type == "MostUnstableMode" )
+						mode = ScanMode::MostUnstableMode;
+					else if ( type == "TrackRoot" )
+						mode = ScanMode::TrackRoot;
+					else if ( type == "AllRoots" )
+						mode = ScanMode::AllRoots;
+					else
+						throw std::invalid_argument( "Unknown Scanning Mode: " + type );
+
 
 					std::string parameter = tags.second.get<std::string>( "<xmlattr>.parameter" );
 					auto it = ScanMap.find( parameter );
@@ -139,18 +150,9 @@ namespace DispReln {
 							throw std::invalid_argument( "When you scan in density or temperature gradient you need to specify which species to scan in." );
 						}
 					}
-					
-					std::string type = tags.second.get<std::string>( "<xmlattr>.type" );
-					if ( type == "MostUnstableMode" )
-						mode = ScanMode::MostUnstableMode;
-					else if ( type == "TrackRoot" )
-						mode = ScanMode::TrackRoot;
-					else
-						throw std::invalid_argument( "Unknown Scanning Mode: " + type );
 
 					double Tolerance = tags.second.get( "<xmlattr>.tol", 0.001 );
 
-					
 
 					Scan badger_Scan( param, mode );
 					badger_Scan.beta = 0.0;

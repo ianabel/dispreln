@@ -18,7 +18,7 @@
 using Complex = std::complex<double>;
 using Real = double;
 using RootPair = std::pair< Complex, Real >;
-using RootList_t = std::deque< RootPair >;
+using RootList_t = std::deque<RootPair>;
 
 std::ostream& operator<<( std::ostream& os, RootPair p )
 {
@@ -56,11 +56,16 @@ std::string Header( DispReln::Config::Scan const& Scan, bool want_col_header = t
 	}
 	switch ( Scan.mode )
 	{
+		case DispReln::Config::ScanMode::AllRoots:
+			out << "and finding all roots of the dispersion relation inside the region " << Scan.box << std::endl;
+			break;
 		case DispReln::Config::ScanMode::TrackRoot:
 			out << "and tracking a single root of the dispersion relation" << std::endl;
 			break;
 		case DispReln::Config::ScanMode::MostUnstableMode:
 			out << "and tracking the most unstable mode" << std::endl;
+			break;
+		default:
 			break;
 	}
 
@@ -89,7 +94,7 @@ std::string Footer( DispReln::Config::Scan const& Scan )
 	return "\n\n";
 }
 
-template<typename T> std::deque<RootPair > DoScan( DispReln::Config::Scan MainScan, T scanner )
+template<typename T> std::deque<RootPair> DoScan( DispReln::Config::Scan MainScan, T scanner )
 {
 	switch ( MainScan.mode )
 	{
@@ -99,11 +104,14 @@ template<typename T> std::deque<RootPair > DoScan( DispReln::Config::Scan MainSc
 		case DispReln::Config::ScanMode::MostUnstableMode:
 			return MostUnstableModes( MainScan.box, scanner, MainScan.values, MainScan.tolerance );
 			break;
+		case DispReln::Config::ScanMode::AllRoots:
+			return AllRoots( MainScan.box, scanner, MainScan.values, MainScan.tolerance );
+			break;
 	}
-	return std::deque<RootPair >();
+	return std::deque<RootPair>();
 }
 
-template<typename T> std::deque<RootPair > PerformScan( DispReln::Config::Scan MainScan, T physics )
+template<typename T> std::deque<RootPair> PerformScan( DispReln::Config::Scan MainScan, T physics )
 {
 	for ( auto &f : MainScan.fixed )
 	{
@@ -126,7 +134,7 @@ template<typename T> std::deque<RootPair > PerformScan( DispReln::Config::Scan M
 		}
 	}
 
-	std::deque< RootPair > scan;
+	std::deque<RootPair> scan;
 
 	DispReln::ky_scanner<T> kyScan( physics );
 	DispReln::kpar_scanner<T> kparScan( physics );
