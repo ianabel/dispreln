@@ -207,7 +207,7 @@ namespace DispReln {
 							else
 								badger_Scan.normalization = it->second;
 						}
-						else if ( subtags.first == "<xmlattr>" )
+						else if ( subtags.first == "<xmlattr>" || subtags.first == "<xmlcomment>" )
 						{
 							continue;
 						}

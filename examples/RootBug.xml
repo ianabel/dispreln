@@ -18,3 +18,22 @@
 	</range>
 </scan>
 
+<scan parameter="ky" type="AllRoots" tolerance="1e-6" >
+	<fixed kpar="1.0" kx="0.0" beta_ref="10.0"/>
+	<output normalization="alfven"/>
+	<box>
+		<lower>(1.0,-0.50)</lower>
+		<upper>(8.0,-6.50)</upper>
+	</box>
+	<!-- Values of ky that we are probing -->
+	<val>30</val>
+	<val>31</val>
+	<val>32</val>
+	<val>33</val>
+	<val>34</val>
+	<val>35</val>
+	<val>35.5</val>
+	<val>36</val>
+	<val>36.5</val>
+	<val>37</val>
+</scan>

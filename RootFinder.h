@@ -232,7 +232,6 @@ namespace RootFinder {
 	template<typename T> std::deque< std::pair< Complex, Real > > AllRoots( RootBoundingBox Initial, T const& G, std::list<Real> parameters, Real tol = 1e-3 )
 	{
 		RootBoundingBox box = Initial;
-		Real centre_in_omega = box.centre().real();
 		std::deque< std::pair< Complex, Real > > RootList;
 
 		for ( auto alpha : parameters ) 
