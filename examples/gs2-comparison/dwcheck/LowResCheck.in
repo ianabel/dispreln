@@ -1,0 +1,288 @@
+!==============================================================================
+!  		GS2 INPUT FILE
+!==============================================================================
+!
+!  GS2 is a gyrokinetic flux tube initial value turbulence code 
+!  which can be used for fusion or astrophysical plasmas.
+!  
+!  	See http://gyrokinetics.sourceforge.net
+!
+!==============================================================================
+
+!==============================================================================
+! GENERAL SETUP
+!==============================================================================
+! 
+! Linear Physics Scan for Slab Geometery, prelude to pedestal physics scans
+! This is the preliminary electrostatic setup.
+!
+!==============================================================================
+
+
+!==============================
+!GENERAL PARAMETERS  
+!==============================
+&parameters
+ beta = 0   ! Ratio of particle to magnetic pressure (reference Beta, not total beta):  beta=n_0 T_0 /( B^2 / (8 pi))
+ zeff = 1.0 ! Effective ionic charge.
+/
+
+&kt_grids_knobs
+ grid_option = "range" ! The general layout of the perpendicular grid.
+/
+
+!==============================
+! Perpendicular Grid
+! What k's are we simulating?
+! 
+!==============================
+&kt_grids_range_parameters
+
+ ! Number of modes
+ ntheta0 = 1 ! Scan in kx
+ naky = 2    ! Scan in ky (for linear runs this is the actual number of k_y modes simulated. aliasing is a nonlinear issue due to pseudospectrality)
+
+ ! k_y range in rho_1 units (i.e. rho_i )
+ aky_min = 6.0
+ aky_max = 12.0
+
+ ! Unsheared slab options
+ akx_min = 0.0
+ akx_max = 0.0
+
+ ! If the slab is sheared, one has to use theta
+ ! theta0_min = 0.0
+ ! theta0_max = 0.0
+ 
+/
+
+!==============================
+!  
+!==============================
+&theta_grid_parameters
+
+ ntheta = 24 ! Number of points along field line (theta) per 2 pi segment
+ nperiod = 1 ! Number of 2 pi segments along equilibrium magnetic field.
+
+ ! Disable Trapping
+ eps = 0.0 ! eps=r/R
+
+ ! Disable V_drift
+ epsl = 0.0 ! epsl=2 a/R
+
+ ! Unshear the slab 
+ shat = 0.0 ! When shat = 0.0, you must use akx above, and not theta0 (it's still ntheta0 though)
+
+ ! Do NOT use pk in a slab, use kp
+ kp = 1.0 ! Set L_z = 2*pi*a (this now defines a=L_ref)
+
+ shift = 0.0 ! <-- Not sure what shift does in the slab, but zero seems like a good idea
+/
+
+!==============================
+!  
+!==============================
+&theta_grid_knobs
+ ! s-alpha with eps = 0 && epsl = 0 
+ ! is a slab. I hope.
+ equilibrium_option = "s-alpha" ! Controls which geometric assumptions are used in the run.
+/
+
+!==============================
+!  
+!==============================
+&theta_grid_salpha_knobs
+ model_option = "default" 
+/
+
+!==============================
+!PITCH ANGLE/ENERGY GRID SETUP  
+!==============================
+&le_grids_knobs
+ ngauss = 12 ! Number of untrapped pitch-angles moving in one direction along field line.
+ negrid = 12 ! Total number of energy grid points
+/
+
+!==============================
+!BOUNDARY CONDITIONS  
+!==============================
+&dist_fn_knobs
+
+ ! Boundary Conditions
+ gridfac = 1.0 ! Affects boundary condition at end of theta grid.
+
+ ! A slab really is periodic, at least if we're electrostatic.
+ boundary_option = "periodic" ! Sets the boundary condition along the field line (i.e. the boundary conditions at theta = +- pi).
+ nonad_zero = .true. ! If true switches on new parallel boundary condition where h=0 at incoming boundary instead of g=0.
+
+ ! Flow shear options
+ g_exb = 0.0
+ omprimfac = 1.0 
+/
+
+!==============================
+!ALGORITHMIC CHOICES  
+!==============================
+&fields_knobs
+ field_option = "implicit" ! Controls which time-advance algorithm is used for the linear terms.
+/
+
+!==============================
+!  
+!==============================
+&knobs
+
+ ! wstar magic
+ wstar_units = .false. ! For linear runs only. Evolves each k_y with a different timestep.
+
+ ! Which fields are we using?
+ ! 1.0 = on ; 0.0 = off ; anything else is deviant
+ fphi = 1.0 
+ fapar = 0.0
+ fbpar = 0.0
+
+
+ ! Time stepping
+ delt = 0.0025 ! Time step
+ nstep = 50000 ! Maximum number of timesteps
+ avail_cpu_time = 900 ! set by make-batch
+/
+
+!==============================
+!  
+!==============================
+&reinit_knobs
+ delt_adj = 2.0 ! When the time step needs to be changed, it is adjusted 
+ delt_minimum = 1.0e-06 ! The minimum time step is delt_minimum.
+ abort_rapid_time_step_change = .true.
+/
+
+!==============================
+!  
+!==============================
+&layouts_knobs
+ layout = "lexys" ! 'yxles', 'lxyes', 'lyxes', 'lexys' Determines the way the grids are laid out in memory.
+/
+
+!==============================
+!COLLISIONS  
+!==============================
+&collisions_knobs
+ collision_model = "none" ! Collision model used in the simulation. Options: 'default', 'none', 'lorentz', 'ediffuse'
+/
+
+!==============================
+!NONLINEARITY  
+!==============================
+&nonlinear_terms_knobs
+ nonlinear_mode = "off" ! Include nonlinear terms? ('on','off')
+ flow_mode = "off" 
+ cfl = 0.1 ! The maximum delt < cfl * min(Delta_perp/v_perp)
+/
+
+!==============================
+!EVOLVED SPECIES  
+!==============================
+&species_knobs
+ nspec = 2! Number of kinetic species evolved.
+/
+
+!==============================
+!SPECIES PARAMETERS 1 
+!==============================
+&species_parameters_1
+ ! General Parameters
+ type = "ion"
+ z = 1.0      ! Charge
+ mass = 1.0   ! Mass
+ dens = 1.0   ! Density	
+ temp = 1.0   ! Temperature
+ vnewk = 0.0  ! Collision Frequency
+
+ ! Gradients
+ tprim = 0.0 ! -1/T (dT/drho)
+ fprim = 7.5 ! -1/n (dn/drho)
+ uprim = 0.0 ! Evil?
+/
+
+!==============================
+! 1 knobs
+!==============================
+&dist_fn_species_knobs_1
+ fexpr = 0.48  ! Temporal implicitness parameter. Recommended value: 0.48
+ bakdif = 0.05 ! Spatial implicitness parameter. Recommended value: 0.05
+/
+
+!==============================
+!SPECIES PARAMETERS 2 
+!==============================
+&species_parameters_2
+
+ ! General Parameters
+ type = "electron" 
+ z = -1.0         ! Charge
+ mass = 0.0002724 ! Mass -- 1/3670 (deuteron is 3670 not 3672)
+ dens  = 1.0      ! Density	
+ temp  = 1.0      ! Temperature
+ vnewk = 0.0      ! Collision Frequency (needs manually setting to make sure it's 
+                  ! compatable with the other collision frequencies)
+
+ ! Gradients
+ tprim = 0.0 ! -1/T (dT/drho)
+ fprim = 7.5 ! -1/n (dn/drho)
+ uprim = 0.0 ! Still Evil.
+
+ ! Magic
+ ! bessfac = 0.0 ! Turn off electron FLR
+/
+
+!==============================
+! 2 knobs
+!==============================
+&dist_fn_species_knobs_2
+ fexpr = 0.48  ! Temporal implicitness parameter. Recommended value: 0.48
+ bakdif = 0.05 ! Spatial implicitness parameter. Recommended value: 0.05
+/
+
+!==============================
+!INITIAL CONDITIONS  
+!==============================
+&init_g_knobs
+ chop_side = .false. ! Rarely needed. Forces asymmetry into initial condition.
+ phiinit = 0.001 ! Average amplitude of initial perturbation of each Fourier mode.
+ ginit_option = "noise" ! Sets the way that the distribution function is initialized.
+/
+
+!==============================
+!DIAGNOSTICS  
+!==============================
+&gs2_diagnostics_knobs
+ print_flux_line = .false. ! Instantaneous fluxes output to screen
+ write_nl_flux = .true. ! Write nonlinear fluxes as a function of time.
+ print_line = .false. ! Estimated frequencies and growth rates to the screen/stdout
+ write_verr = .true. ! Write velocity space diagnostics to '.lpc' and '.verr' files
+ write_line = .false. ! If (write_ascii = T) write estimated frequencies and growth rates to the output file
+ write_hrate = .false. ! Write heating rate, collisonal entropy generation etc to '.heat'
+ write_final_epar = .false. ! If (write_ascii = T) E_parallel(theta) written to runname.eigenfunc
+ write_avg_moments = .false. ! Write flux surface averaged low-order moments of g to runname.out.nc and runname.moments (if write_ascii = T)
+ write_omega = .false. ! If (write_ascii = T) instantaneous omega to output file. Very heavy output
+ write_omavg = .true. ! If (write_ascii = T) time-averaged growth rate and frequency to the output file.
+ write_eigenfunc = .true. ! If (write_ascii = T) Normalized phi written to runname.eigenfunc
+ write_final_fields = .true. ! If (write_ascii = T) Phi(theta) written to '.fields'
+ write_final_moments = .true. ! write final n, T
+ nsave = 500 ! Write restart files every nsave timesteps
+ nwrite = 50 ! Output diagnostic data every nwrite
+ navg = 10 ! Any time averages performed over navg
+ omegatol = -0.001 ! The convergence has to be better than one part in 1/omegatol
+ omegatinst = 500.0 ! Recommended value: 500.
+ save_for_restart = .false. ! Write restart files.
+ write_ascii = .true.
+ write_fields = .true.
+ 
+ write_phi_over_time = .true.  ! Write entire Phi field to NetCDF file every nwrite.
+ write_apar_over_time = .false. ! Write entire A_parallel field to NetCDF file every nwrite.
+ write_bpar_over_time = .false. ! Write entire B_parallel field to NetCDF file every nwrite.
+ 
+  ! write_correlation not specified --- Write parallel correlation.
+/
+

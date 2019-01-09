@@ -1,0 +1,2 @@
+Warning : Some lowflow related geometrical terms are forced to zero in cases with eps=0.
+ Error: Require slepc/petsc

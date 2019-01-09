@@ -1,0 +1,2333 @@
+netcdf DriftWaveCheck.out {
+dimensions:
+	kx = 1 ;
+	ky = 8 ;
+	theta = 33 ;
+	energy = 12 ;
+	lambda = 24 ;
+	vpa = 288 ;
+	species = 2 ;
+	t = UNLIMITED ; // (201 currently)
+	ri = 2 ;
+	\2 = 2 ;
+	\3 = 3 ;
+	\4 = 4 ;
+	\5 = 5 ;
+	input_file_dim = 2875 ;
+variables:
+	double kx(kx) ;
+		kx:description = "Values of kx, the wavenumber perpendicular to the flux surface " ;
+		kx:units = "1/rho_r" ;
+	double ky(ky) ;
+		ky:description = "Values of ky, the wavenumber in the direction of grad alpha " ;
+		ky:units = "1/rho_r" ;
+	double theta0(ky, kx) ;
+		theta0:description = "Values of theta0, poloidal angle where mode radial wavenumber=0 " ;
+		theta0:units = "rad" ;
+	double theta(theta) ;
+		theta:description = "Values of theta, the poloidal angle. " ;
+		theta:units = "rad" ;
+	double energy(energy) ;
+		energy:description = "Values of the energy grid. " ;
+		energy:units = "T_s" ;
+	double lambda(lambda) ;
+		lambda:description = "Values of lambda = energy/magnetic moment" ;
+		lambda:units = "1/ (2 B_a)" ;
+	double charge(species) ;
+		charge:description = "Values of charge for each species" ;
+		charge:units = "e" ;
+	double mass(species) ;
+		mass:description = "Mass for each species" ;
+		mass:units = "AMU" ;
+	double dens(species) ;
+		dens:description = "Normalised density for each species" ;
+		dens:units = "nref" ;
+	double temp(species) ;
+		temp:description = "Normalised temperature Ts for each species" ;
+		temp:units = "Tref" ;
+	double fprim(species) ;
+		fprim:description = "Normalised density gradient scalelength a/n.dn/drho for each species" ;
+		fprim:units = "???" ;
+	double tprim(species) ;
+		tprim:description = "Normalised density gradient scalelength a/T.dT/drho for each species" ;
+		tprim:units = "???" ;
+	double uprim(species) ;
+		uprim:description = "Normalised upar gradient dUpar/drho for each species" ;
+		uprim:units = "v_tref/aref" ;
+	double vnewk(species) ;
+		vnewk:description = "Normalised collision frequency for each species" ;
+		vnewk:units = "vtref/aref" ;
+	int type(species) ;
+		type:description = "Type of each species: 1=ion, 2=electron, 3=slowing down, 4=trace" ;
+		type:units = "" ;
+	double beta ;
+		beta:description = "Reference beta" ;
+		beta:units = "2.mu0.nref.Tref/B_a**2" ;
+	double bmag(theta) ;
+		bmag:description = "Values of bmag, the magnitude of the magnetic field" ;
+		bmag:units = "B_a" ;
+	double bpol(theta) ;
+		bpol:description = "Values of Bpol, the poloidal magnetic field" ;
+		bpol:units = "B_a" ;
+	double gradpar(theta) ;
+		gradpar:description = "Values of gradpar, which multiplies the parallel derivative" ;
+		gradpar:units = "a" ;
+	double gbdrift(theta) ;
+		gbdrift:description = "Values of gbdrift, the magnetic gradient drift " ;
+		gbdrift:units = "TBC" ;
+	double gbdrift0(theta) ;
+		gbdrift0:description = "Values of gbdrift0, " ;
+		gbdrift0:units = "TBC" ;
+	double cvdrift(theta) ;
+		cvdrift:description = "Values of cvdrift, the magnetic curvature drift" ;
+		cvdrift:units = "TBC" ;
+	double cvdrift0(theta) ;
+		cvdrift0:description = "Values of cvdrift0, " ;
+		cvdrift0:units = "TBC" ;
+	double gds2(theta) ;
+		gds2:description = "Values of gds2, " ;
+		gds2:units = "TBC" ;
+	double gds21(theta) ;
+		gds21:description = "Values of gds21, " ;
+		gds21:units = "TBC" ;
+	double gds22(theta) ;
+		gds22:description = "Values of gds22, " ;
+		gds22:units = "TBC" ;
+	double grho(theta) ;
+		grho:description = "Values of grho, " ;
+		grho:units = "TBC" ;
+	double jacob(theta) ;
+		jacob:description = "Values of jacob, " ;
+		jacob:units = "TBC" ;
+	double shat ;
+		shat:description = "Values of shat, the magnetic shear" ;
+		shat:units = "TBC" ;
+	double drhodpsi ;
+		drhodpsi:description = "Values of drhodpsi, " ;
+		drhodpsi:units = "TBC" ;
+	double eps ;
+		eps:description = "Values of eps, " ;
+		eps:units = "TBC" ;
+	double cdrift(theta) ;
+		cdrift:description = "Values of cdrift, " ;
+		cdrift:units = "TBC" ;
+	double cdrift0(theta) ;
+		cdrift0:description = "Values of cdrift0, " ;
+		cdrift0:units = "TBC" ;
+	double qval ;
+		qval:description = "Values of qval, " ;
+		qval:units = "TBC" ;
+	double Rplot(theta) ;
+		Rplot:description = "The major radius at the centre of the flux tube " ;
+		Rplot:units = "a" ;
+	double Zplot(theta) ;
+		Zplot:description = "The height above the midplane at the centre of the flux tube " ;
+		Zplot:units = "a" ;
+	double aplot(theta) ;
+		aplot:description = "The toroidal angle at the centre of the flux tube " ;
+		aplot:units = "rad" ;
+	double Rprime(theta) ;
+		Rprime:description = "d/dx of the major radius at the centre of the flux tube " ;
+		Rprime:units = "a/rho_r" ;
+	double Zprime(theta) ;
+		Zprime:description = "d/dx of the height above the midplane at the centre of the flux tube " ;
+		Zprime:units = "a/rho_r" ;
+	double aprime(theta) ;
+		aprime:description = "d/dx of the toroidal angle at the centre of the flux tube " ;
+		aprime:units = "rad/rho_r" ;
+	double mref ;
+		mref:description = "Reference mass in atomic mass units " ;
+		mref:units = "a.m.u." ;
+	double zref ;
+		zref:description = "Reference charge" ;
+		zref:units = "proton charge" ;
+	double nref ;
+		nref:description = "The reference density " ;
+		nref:units = "m^-3" ;
+	double tref ;
+		tref:description = "The reference temperature " ;
+		tref:units = "eV" ;
+	double aref ;
+		aref:description = "The reference length " ;
+		aref:units = "m" ;
+	double vref ;
+		vref:description = "The reference (thermal) velocity " ;
+		vref:units = "m/s" ;
+	double bref ;
+		bref:description = "The reference magnetic field " ;
+		bref:units = "Tesla" ;
+	double rhoref ;
+		rhoref:description = "The reference larmour radius " ;
+		rhoref:units = "m" ;
+	char input_file(input_file_dim) ;
+		input_file:description = "Full text of the input file" ;
+		input_file:units = "text" ;
+	double t(t) ;
+		t:description = "Values of the time coordinate" ;
+		t:units = "a/v_thr" ;
+	double phi2_by_ky(t, ky) ;
+		phi2_by_ky:description = "The electrostatic potential squared and averaged over theta and kx, as a function of time" ;
+		phi2_by_ky:units = "(T_r/e)^2" ;
+	double phi2_by_kx(t, kx) ;
+		phi2_by_kx:description = "The electrostatic potential squared and averaged over theta and ky, as a function of time" ;
+		phi2_by_kx:units = "(T_r/e)^2" ;
+	double phi2(t) ;
+		phi2:description = "The electrostatic potential squared and averaged over theta, kx and ky, as a function of time" ;
+		phi2:units = "(T_r/e)^2" ;
+	double phi(ky, kx, theta, ri) ;
+		phi:description = "The electrostatic potential" ;
+		phi:units = "T_r/e" ;
+	double phi_igomega_by_mode(t, ky, kx, ri) ;
+		phi_igomega_by_mode:description = "The electrostatic potential at ig=igomega, as a function of kx and ky" ;
+		phi_igomega_by_mode:units = "T_r/e" ;
+	double phi2_by_mode(t, ky, kx) ;
+		phi2_by_mode:description = "The electrostatic potential squared and averaged over theta, as a function of kx and ky" ;
+		phi2_by_mode:units = "T_r/e" ;
+	double heat_flux_diff(t, species) ;
+		heat_flux_diff:description = "Diffusive estimate of turbulent flux of heat averaged over kx and ky, as a function of species and time" ;
+		heat_flux_diff:units = "Q_gB = " ;
+	double total_heat_flux_diff_by_ky(t, ky) ;
+		total_heat_flux_diff_by_ky:description = "Diffusive estimate of turbulent flux of heat summed over species and averaged over kx, as a function of ky and time" ;
+		total_heat_flux_diff_by_ky:units = "Q_gB = " ;
+	double total_heat_flux_diff_by_kx(t, kx) ;
+		total_heat_flux_diff_by_kx:description = "Diffusive estimate of turbulent flux of heat summed over species and averaged over ky, as a function of kx and time" ;
+		total_heat_flux_diff_by_kx:units = "Q_gB = " ;
+	double total_heat_flux_diff(t) ;
+		total_heat_flux_diff:description = "Diffusive estimate of turbulent flux of heat summed over species and averaged over kx and ky, as a function of time" ;
+		total_heat_flux_diff:units = "Q_gB = " ;
+	double heat_flux_diff_by_mode(t, species, ky, kx) ;
+		heat_flux_diff_by_mode:description = "Diffusive estimate of turbulent flux of heat as a function of species, kx and ky" ;
+		heat_flux_diff_by_mode:units = "Q_gB = " ;
+	double total_heat_flux_diff_by_mode(t, ky, kx) ;
+		total_heat_flux_diff_by_mode:description = "Diffusive estimate of turbulent flux of heat summed over species, as a function of kx and ky" ;
+		total_heat_flux_diff_by_mode:units = "Q_gB = " ;
+	double part_flux_diff(t, species) ;
+		part_flux_diff:description = "Diffusive estimate of turbulent flux of particles averaged over kx and ky, as a function of species and time" ;
+		part_flux_diff:units = "n_r? " ;
+	double total_part_flux_diff_by_ky(t, ky) ;
+		total_part_flux_diff_by_ky:description = "Diffusive estimate of turbulent flux of particles summed over species and averaged over kx, as a function of ky and time" ;
+		total_part_flux_diff_by_ky:units = "n_r? " ;
+	double total_part_flux_diff_by_kx(t, kx) ;
+		total_part_flux_diff_by_kx:description = "Diffusive estimate of turbulent flux of particles summed over species and averaged over ky, as a function of kx and time" ;
+		total_part_flux_diff_by_kx:units = "n_r? " ;
+	double total_part_flux_diff(t) ;
+		total_part_flux_diff:description = "Diffusive estimate of turbulent flux of particles summed over species and averaged over kx and ky, as a function of time" ;
+		total_part_flux_diff:units = "n_r? " ;
+	double part_flux_diff_by_mode(t, species, ky, kx) ;
+		part_flux_diff_by_mode:description = "Diffusive estimate of turbulent flux of particles as a function of species, kx and ky" ;
+		part_flux_diff_by_mode:units = "n_r? " ;
+	double total_part_flux_diff_by_mode(t, ky, kx) ;
+		total_part_flux_diff_by_mode:description = "Diffusive estimate of turbulent flux of particles summed over species, as a function of kx and ky" ;
+		total_part_flux_diff_by_mode:units = "n_r? " ;
+	double es_heat_flux_diff_max(t, species) ;
+		es_heat_flux_diff_max:description = " A linear estimate of the heat flux, as a function of species and time" ;
+		es_heat_flux_diff_max:units = "Q_gB" ;
+	double heat_flux_diff_max(t) ;
+		heat_flux_diff_max:description = " A linear estimate of the heat flux, as a function of  time" ;
+		heat_flux_diff_max:units = "Q_gB" ;
+	double es_particle_flux_diff_max(t, species) ;
+		es_particle_flux_diff_max:description = " A linear estimate of the particle flux, as a function of species and time" ;
+		es_particle_flux_diff_max:units = "Q_gB" ;
+	double particle_flux_diff_max(t) ;
+		particle_flux_diff_max:description = " A linear estimate of the particle flux, as a function of  time" ;
+		particle_flux_diff_max:units = "Q_gB" ;
+	double diffusivity(t) ;
+		diffusivity:description = " A linear estimate of the diffusivity" ;
+		diffusivity:units = "TBC" ;
+	double es_heat_flux(t, species) ;
+		es_heat_flux:description = "Turbulent flux of heat averaged over kx and ky, as a function of species and time" ;
+		es_heat_flux:units = "Q_gB = " ;
+	double total_es_heat_flux_by_ky(t, ky) ;
+		total_es_heat_flux_by_ky:description = "Turbulent flux of heat summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_heat_flux_by_ky:units = "Q_gB = " ;
+	double total_es_heat_flux_by_kx(t, kx) ;
+		total_es_heat_flux_by_kx:description = "Turbulent flux of heat summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_heat_flux_by_kx:units = "Q_gB = " ;
+	double total_es_heat_flux(t) ;
+		total_es_heat_flux:description = "Turbulent flux of heat summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_heat_flux:units = "Q_gB = " ;
+	double es_heat_flux_by_mode(t, species, ky, kx) ;
+		es_heat_flux_by_mode:description = "Turbulent flux of heat as a function of species, kx and ky" ;
+		es_heat_flux_by_mode:units = "Q_gB = " ;
+	double total_es_heat_flux_by_mode(t, ky, kx) ;
+		total_es_heat_flux_by_mode:description = "Turbulent flux of heat summed over species, as a function of kx and ky" ;
+		total_es_heat_flux_by_mode:units = "Q_gB = " ;
+	double es_heat_flux_par(t, species) ;
+		es_heat_flux_par:description = "Turbulent flux of parallel heat averaged over kx and ky, as a function of species and time" ;
+		es_heat_flux_par:units = "Q_gB = " ;
+	double total_es_heat_flux_par_by_ky(t, ky) ;
+		total_es_heat_flux_par_by_ky:description = "Turbulent flux of parallel heat summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_heat_flux_par_by_ky:units = "Q_gB = " ;
+	double total_es_heat_flux_par_by_kx(t, kx) ;
+		total_es_heat_flux_par_by_kx:description = "Turbulent flux of parallel heat summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_heat_flux_par_by_kx:units = "Q_gB = " ;
+	double total_es_heat_flux_par(t) ;
+		total_es_heat_flux_par:description = "Turbulent flux of parallel heat summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_heat_flux_par:units = "Q_gB = " ;
+	double es_heat_flux_par_by_mode(t, species, ky, kx) ;
+		es_heat_flux_par_by_mode:description = "Turbulent flux of parallel heat as a function of species, kx and ky" ;
+		es_heat_flux_par_by_mode:units = "Q_gB = " ;
+	double total_es_heat_flux_par_by_mode(t, ky, kx) ;
+		total_es_heat_flux_par_by_mode:description = "Turbulent flux of parallel heat summed over species, as a function of kx and ky" ;
+		total_es_heat_flux_par_by_mode:units = "Q_gB = " ;
+	double es_heat_flux_perp(t, species) ;
+		es_heat_flux_perp:description = "Turbulent flux of perpendicular heat averaged over kx and ky, as a function of species and time" ;
+		es_heat_flux_perp:units = "Q_gB = " ;
+	double total_es_heat_flux_perp_by_ky(t, ky) ;
+		total_es_heat_flux_perp_by_ky:description = "Turbulent flux of perpendicular heat summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_heat_flux_perp_by_ky:units = "Q_gB = " ;
+	double total_es_heat_flux_perp_by_kx(t, kx) ;
+		total_es_heat_flux_perp_by_kx:description = "Turbulent flux of perpendicular heat summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_heat_flux_perp_by_kx:units = "Q_gB = " ;
+	double total_es_heat_flux_perp(t) ;
+		total_es_heat_flux_perp:description = "Turbulent flux of perpendicular heat summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_heat_flux_perp:units = "Q_gB = " ;
+	double es_heat_flux_perp_by_mode(t, species, ky, kx) ;
+		es_heat_flux_perp_by_mode:description = "Turbulent flux of perpendicular heat as a function of species, kx and ky" ;
+		es_heat_flux_perp_by_mode:units = "Q_gB = " ;
+	double total_es_heat_flux_perp_by_mode(t, ky, kx) ;
+		total_es_heat_flux_perp_by_mode:description = "Turbulent flux of perpendicular heat summed over species, as a function of kx and ky" ;
+		total_es_heat_flux_perp_by_mode:units = "Q_gB = " ;
+	double es_part_flux(t, species) ;
+		es_part_flux:description = "Turbulent flux of particles averaged over kx and ky, as a function of species and time" ;
+		es_part_flux:units = "n_r? " ;
+	double total_es_part_flux_by_ky(t, ky) ;
+		total_es_part_flux_by_ky:description = "Turbulent flux of particles summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_part_flux_by_ky:units = "n_r? " ;
+	double total_es_part_flux_by_kx(t, kx) ;
+		total_es_part_flux_by_kx:description = "Turbulent flux of particles summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_part_flux_by_kx:units = "n_r? " ;
+	double total_es_part_flux(t) ;
+		total_es_part_flux:description = "Turbulent flux of particles summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_part_flux:units = "n_r? " ;
+	double es_part_flux_by_mode(t, species, ky, kx) ;
+		es_part_flux_by_mode:description = "Turbulent flux of particles as a function of species, kx and ky" ;
+		es_part_flux_by_mode:units = "n_r? " ;
+	double total_es_part_flux_by_mode(t, ky, kx) ;
+		total_es_part_flux_by_mode:description = "Turbulent flux of particles summed over species, as a function of kx and ky" ;
+		total_es_part_flux_by_mode:units = "n_r? " ;
+	double es_part_tormom_flux(t, species) ;
+		es_part_tormom_flux:description = "Ask Jung-Pyo Lee... averaged over kx and ky, as a function of species and time" ;
+		es_part_tormom_flux:units = "? " ;
+	double total_es_part_tormom_flux_by_ky(t, ky) ;
+		total_es_part_tormom_flux_by_ky:description = "Ask Jung-Pyo Lee... summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_part_tormom_flux_by_ky:units = "? " ;
+	double total_es_part_tormom_flux_by_kx(t, kx) ;
+		total_es_part_tormom_flux_by_kx:description = "Ask Jung-Pyo Lee... summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_part_tormom_flux_by_kx:units = "? " ;
+	double total_es_part_tormom_flux(t) ;
+		total_es_part_tormom_flux:description = "Ask Jung-Pyo Lee... summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_part_tormom_flux:units = "? " ;
+	double es_part_tormom_flux_by_mode(t, species, ky, kx) ;
+		es_part_tormom_flux_by_mode:description = "Ask Jung-Pyo Lee... as a function of species, kx and ky" ;
+		es_part_tormom_flux_by_mode:units = "? " ;
+	double total_es_part_tormom_flux_by_mode(t, ky, kx) ;
+		total_es_part_tormom_flux_by_mode:description = "Ask Jung-Pyo Lee... summed over species, as a function of kx and ky" ;
+		total_es_part_tormom_flux_by_mode:units = "? " ;
+	double es_mom_flux(t, species) ;
+		es_mom_flux:description = "Flux of toroidal angular momentum averaged over kx and ky, as a function of species and time" ;
+		es_mom_flux:units = "Pi_gB =  " ;
+	double total_es_mom_flux_by_ky(t, ky) ;
+		total_es_mom_flux_by_ky:description = "Flux of toroidal angular momentum summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_mom_flux_by_ky:units = "Pi_gB =  " ;
+	double total_es_mom_flux_by_kx(t, kx) ;
+		total_es_mom_flux_by_kx:description = "Flux of toroidal angular momentum summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_mom_flux_by_kx:units = "Pi_gB =  " ;
+	double total_es_mom_flux(t) ;
+		total_es_mom_flux:description = "Flux of toroidal angular momentum summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_mom_flux:units = "Pi_gB =  " ;
+	double es_mom_flux_by_mode(t, species, ky, kx) ;
+		es_mom_flux_by_mode:description = "Flux of toroidal angular momentum as a function of species, kx and ky" ;
+		es_mom_flux_by_mode:units = "Pi_gB =  " ;
+	double total_es_mom_flux_by_mode(t, ky, kx) ;
+		total_es_mom_flux_by_mode:description = "Flux of toroidal angular momentum summed over species, as a function of kx and ky" ;
+		total_es_mom_flux_by_mode:units = "Pi_gB =  " ;
+	double es_mom_flux_par(t, species) ;
+		es_mom_flux_par:description = "Flux of the parallel component of the toroidal angular momentum averaged over kx and ky, as a function of species and time" ;
+		es_mom_flux_par:units = "Pi_gB =  " ;
+	double total_es_mom_flux_par_by_ky(t, ky) ;
+		total_es_mom_flux_par_by_ky:description = "Flux of the parallel component of the toroidal angular momentum summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_mom_flux_par_by_ky:units = "Pi_gB =  " ;
+	double total_es_mom_flux_par_by_kx(t, kx) ;
+		total_es_mom_flux_par_by_kx:description = "Flux of the parallel component of the toroidal angular momentum summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_mom_flux_par_by_kx:units = "Pi_gB =  " ;
+	double total_es_mom_flux_par(t) ;
+		total_es_mom_flux_par:description = "Flux of the parallel component of the toroidal angular momentum summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_mom_flux_par:units = "Pi_gB =  " ;
+	double es_mom_flux_par_by_mode(t, species, ky, kx) ;
+		es_mom_flux_par_by_mode:description = "Flux of the parallel component of the toroidal angular momentum as a function of species, kx and ky" ;
+		es_mom_flux_par_by_mode:units = "Pi_gB =  " ;
+	double total_es_mom_flux_par_by_mode(t, ky, kx) ;
+		total_es_mom_flux_par_by_mode:description = "Flux of the parallel component of the toroidal angular momentum summed over species, as a function of kx and ky" ;
+		total_es_mom_flux_par_by_mode:units = "Pi_gB =  " ;
+	double es_energy_exchange(t, species) ;
+		es_energy_exchange:description = "?? averaged over kx and ky, as a function of species and time" ;
+		es_energy_exchange:units = "Pi_gB =  " ;
+	double total_es_energy_exchange_by_ky(t, ky) ;
+		total_es_energy_exchange_by_ky:description = "?? summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_energy_exchange_by_ky:units = "Pi_gB =  " ;
+	double total_es_energy_exchange_by_kx(t, kx) ;
+		total_es_energy_exchange_by_kx:description = "?? summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_energy_exchange_by_kx:units = "Pi_gB =  " ;
+	double total_es_energy_exchange(t) ;
+		total_es_energy_exchange:description = "?? summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_energy_exchange:units = "Pi_gB =  " ;
+	double es_energy_exchange_by_mode(t, species, ky, kx) ;
+		es_energy_exchange_by_mode:description = "?? as a function of species, kx and ky" ;
+		es_energy_exchange_by_mode:units = "Pi_gB =  " ;
+	double total_es_energy_exchange_by_mode(t, ky, kx) ;
+		total_es_energy_exchange_by_mode:description = "?? summed over species, as a function of kx and ky" ;
+		total_es_energy_exchange_by_mode:units = "Pi_gB =  " ;
+	double es_mom_flux_perp(t, species) ;
+		es_mom_flux_perp:description = "Flux of the perpendicular component of the toroidal angular momentum averaged over kx and ky, as a function of species and time" ;
+		es_mom_flux_perp:units = "Pi_gB =  " ;
+	double total_es_mom_flux_perp_by_ky(t, ky) ;
+		total_es_mom_flux_perp_by_ky:description = "Flux of the perpendicular component of the toroidal angular momentum summed over species and averaged over kx, as a function of ky and time" ;
+		total_es_mom_flux_perp_by_ky:units = "Pi_gB =  " ;
+	double total_es_mom_flux_perp_by_kx(t, kx) ;
+		total_es_mom_flux_perp_by_kx:description = "Flux of the perpendicular component of the toroidal angular momentum summed over species and averaged over ky, as a function of kx and time" ;
+		total_es_mom_flux_perp_by_kx:units = "Pi_gB =  " ;
+	double total_es_mom_flux_perp(t) ;
+		total_es_mom_flux_perp:description = "Flux of the perpendicular component of the toroidal angular momentum summed over species and averaged over kx and ky, as a function of time" ;
+		total_es_mom_flux_perp:units = "Pi_gB =  " ;
+	double es_mom_flux_perp_by_mode(t, species, ky, kx) ;
+		es_mom_flux_perp_by_mode:description = "Flux of the perpendicular component of the toroidal angular momentum as a function of species, kx and ky" ;
+		es_mom_flux_perp_by_mode:units = "Pi_gB =  " ;
+	double total_es_mom_flux_perp_by_mode(t, ky, kx) ;
+		total_es_mom_flux_perp_by_mode:description = "Flux of the perpendicular component of the toroidal angular momentum summed over species, as a function of kx and ky" ;
+		total_es_mom_flux_perp_by_mode:units = "Pi_gB =  " ;
+	double es_flux_vs_e(t, species, energy) ;
+		es_flux_vs_e:description = "Electrostatic flux, as function of energy" ;
+		es_flux_vs_e:units = "flux_es(E) = " ;
+	double heat_flux_tot(t) ;
+		heat_flux_tot:description = "Total heat flux, as a function of  time" ;
+		heat_flux_tot:units = "Q_gB" ;
+	double hflux_tot(t) ;
+		hflux_tot:description = "Total heat flux, as a function of  time, same as heat_flux_tot, included  for backwards compatiblity" ;
+		hflux_tot:units = "Q_gB" ;
+	double mom_flux_tot(t) ;
+		mom_flux_tot:description = "Total momentum flux, as a function of  time" ;
+		mom_flux_tot:units = "Pi_gB" ;
+	double vflux_tot(t) ;
+		vflux_tot:description = "Total momentum flux, as a function of  time, same as mom_flux_tot,  included for backwards compatiblity." ;
+		vflux_tot:units = "Pi_gB" ;
+	double part_flux_tot(t) ;
+		part_flux_tot:description = "Total particle flux, as a function of  time" ;
+		part_flux_tot:units = "TBC" ;
+	double zflux_tot(t) ;
+		zflux_tot:description = "Total particle flux, as a function of  time, same as part_flux_tot,  included for backwards compatiblity." ;
+		zflux_tot:units = "TBC" ;
+	double vspace_lpcfrac(t, \3) ;
+		vspace_lpcfrac:description = "Fraction of free energy contained in the high order coefficients of  the Legendre polynomial transform of (1) energy space, (2) untrapped  pitch angles and (3) trapped pitch angles (each should ideally be < 0.1).   Note that there are no trapped pitch angles for certain geometries" ;
+		vspace_lpcfrac:units = "1" ;
+	double vspace_err(t, \2, \5) ;
+		vspace_err:description = "Estimate of the (1) absolute and (2) relative errors resulting from  velocity space integrals in the calculation of the following quantities  in the given dimensions: (1) k phi, energy (2) k phi, untrapped pitch angles  (3) k phi, trapped pitch angles, (4) k apar, energy, (5) k apar, untrapped  angles. Relative errors should be < 0.1. " ;
+		vspace_err:units = "absolute error measures have units T_r/(e rho_r)" ;
+	double vspace_vnewk(t, \2) ;
+		vspace_vnewk:description = "If the simulation is set to vary the collisionality in order to keep  error in velocity integrals to acceptable levels, contains species 1  collisionality in (1) pitch angle and (2) energy  " ;
+		vspace_vnewk:units = "v_thr/a" ;
+	double ntot2_by_ky(t, species, ky) ;
+		ntot2_by_ky:description = "The total perturbed species density squared and averaged over theta and kx" ;
+		ntot2_by_ky:units = "(n_r)^2" ;
+	double ntot2_by_kx(t, species, kx) ;
+		ntot2_by_kx:description = "The total perturbed species density squared and averaged over theta and ky" ;
+		ntot2_by_kx:units = "(n_r)^2" ;
+	double ntot2(t, species) ;
+		ntot2:description = "The total perturbed species density squared and averaged over theta, kx and ky" ;
+		ntot2:units = "(n_r)^2" ;
+	double ntot_flxsurf_avg(t, species, kx, ri) ;
+		ntot_flxsurf_avg:description = "The total perturbed species density flux surface averaged:  averaged over theta, at ky=0 (actally ik==1),  as a function of kx" ;
+		ntot_flxsurf_avg:units = "n_r" ;
+	double ntot(species, ky, kx, theta, ri) ;
+		ntot:description = "The total perturbed species density" ;
+		ntot:units = "n_r" ;
+	double ntot_igomega_by_mode(t, species, ky, kx, ri) ;
+		ntot_igomega_by_mode:description = "The total perturbed species density at ig=igomega, as a function of kx and ky" ;
+		ntot_igomega_by_mode:units = "n_r" ;
+	double ntot_by_mode(t, species, ky, kx, ri) ;
+		ntot_by_mode:description = "The total perturbed species density  averaged over theta, as a function of kx and ky" ;
+		ntot_by_mode:units = "n_r" ;
+	double ntot2_by_mode(t, species, ky, kx) ;
+		ntot2_by_mode:description = "The total perturbed species density squared and averaged over theta, as a function of kx and ky" ;
+		ntot2_by_mode:units = "n_r" ;
+	double density2_by_ky(t, species, ky) ;
+		density2_by_ky:description = "The non-adiabatic part of the perturbed species density squared and averaged over theta and kx" ;
+		density2_by_ky:units = "(n_r)^2" ;
+	double density2_by_kx(t, species, kx) ;
+		density2_by_kx:description = "The non-adiabatic part of the perturbed species density squared and averaged over theta and ky" ;
+		density2_by_kx:units = "(n_r)^2" ;
+	double density2(t, species) ;
+		density2:description = "The non-adiabatic part of the perturbed species density squared and averaged over theta, kx and ky" ;
+		density2:units = "(n_r)^2" ;
+	double density_flxsurf_avg(t, species, kx, ri) ;
+		density_flxsurf_avg:description = "The non-adiabatic part of the perturbed species density flux surface averaged:  averaged over theta, at ky=0 (actally ik==1),  as a function of kx" ;
+		density_flxsurf_avg:units = "n_r" ;
+	double density(species, ky, kx, theta, ri) ;
+		density:description = "The non-adiabatic part of the perturbed species density" ;
+		density:units = "n_r" ;
+	double density_igomega_by_mode(t, species, ky, kx, ri) ;
+		density_igomega_by_mode:description = "The non-adiabatic part of the perturbed species density at ig=igomega, as a function of kx and ky" ;
+		density_igomega_by_mode:units = "n_r" ;
+	double density_by_mode(t, species, ky, kx, ri) ;
+		density_by_mode:description = "The non-adiabatic part of the perturbed species density  averaged over theta, as a function of kx and ky" ;
+		density_by_mode:units = "n_r" ;
+	double density2_by_mode(t, species, ky, kx) ;
+		density2_by_mode:description = "The non-adiabatic part of the perturbed species density squared and averaged over theta, as a function of kx and ky" ;
+		density2_by_mode:units = "n_r" ;
+	double upar2_by_ky(t, species, ky) ;
+		upar2_by_ky:description = "The perturbed parallel flow squared and averaged over theta and kx" ;
+		upar2_by_ky:units = "(v_ths)^2" ;
+	double upar2_by_kx(t, species, kx) ;
+		upar2_by_kx:description = "The perturbed parallel flow squared and averaged over theta and ky" ;
+		upar2_by_kx:units = "(v_ths)^2" ;
+	double upar2(t, species) ;
+		upar2:description = "The perturbed parallel flow squared and averaged over theta, kx and ky" ;
+		upar2:units = "(v_ths)^2" ;
+	double upar_flxsurf_avg(t, species, kx, ri) ;
+		upar_flxsurf_avg:description = "The perturbed parallel flow flux surface averaged:  averaged over theta, at ky=0 (actally ik==1),  as a function of kx" ;
+		upar_flxsurf_avg:units = "v_ths" ;
+	double upar(species, ky, kx, theta, ri) ;
+		upar:description = "The perturbed parallel flow" ;
+		upar:units = "v_ths" ;
+	double upar_igomega_by_mode(t, species, ky, kx, ri) ;
+		upar_igomega_by_mode:description = "The perturbed parallel flow at ig=igomega, as a function of kx and ky" ;
+		upar_igomega_by_mode:units = "v_ths" ;
+	double upar_by_mode(t, species, ky, kx, ri) ;
+		upar_by_mode:description = "The perturbed parallel flow  averaged over theta, as a function of kx and ky" ;
+		upar_by_mode:units = "v_ths" ;
+	double upar2_by_mode(t, species, ky, kx) ;
+		upar2_by_mode:description = "The perturbed parallel flow squared and averaged over theta, as a function of kx and ky" ;
+		upar2_by_mode:units = "v_ths" ;
+	double tpar2_by_ky(t, species, ky) ;
+		tpar2_by_ky:description = "The perturbed parallel temperature squared and averaged over theta and kx" ;
+		tpar2_by_ky:units = "(T_r)^2" ;
+	double tpar2_by_kx(t, species, kx) ;
+		tpar2_by_kx:description = "The perturbed parallel temperature squared and averaged over theta and ky" ;
+		tpar2_by_kx:units = "(T_r)^2" ;
+	double tpar2(t, species) ;
+		tpar2:description = "The perturbed parallel temperature squared and averaged over theta, kx and ky" ;
+		tpar2:units = "(T_r)^2" ;
+	double tpar_flxsurf_avg(t, species, kx, ri) ;
+		tpar_flxsurf_avg:description = "The perturbed parallel temperature flux surface averaged:  averaged over theta, at ky=0 (actally ik==1),  as a function of kx" ;
+		tpar_flxsurf_avg:units = "T_r" ;
+	double tpar(species, ky, kx, theta, ri) ;
+		tpar:description = "The perturbed parallel temperature" ;
+		tpar:units = "T_r" ;
+	double tpar_igomega_by_mode(t, species, ky, kx, ri) ;
+		tpar_igomega_by_mode:description = "The perturbed parallel temperature at ig=igomega, as a function of kx and ky" ;
+		tpar_igomega_by_mode:units = "T_r" ;
+	double tpar_by_mode(t, species, ky, kx, ri) ;
+		tpar_by_mode:description = "The perturbed parallel temperature  averaged over theta, as a function of kx and ky" ;
+		tpar_by_mode:units = "T_r" ;
+	double tpar2_by_mode(t, species, ky, kx) ;
+		tpar2_by_mode:description = "The perturbed parallel temperature squared and averaged over theta, as a function of kx and ky" ;
+		tpar2_by_mode:units = "T_r" ;
+	double tperp2_by_ky(t, species, ky) ;
+		tperp2_by_ky:description = "The perturbed perpendicular temperature squared and averaged over theta and kx" ;
+		tperp2_by_ky:units = "(T_r)^2" ;
+	double tperp2_by_kx(t, species, kx) ;
+		tperp2_by_kx:description = "The perturbed perpendicular temperature squared and averaged over theta and ky" ;
+		tperp2_by_kx:units = "(T_r)^2" ;
+	double tperp2(t, species) ;
+		tperp2:description = "The perturbed perpendicular temperature squared and averaged over theta, kx and ky" ;
+		tperp2:units = "(T_r)^2" ;
+	double tperp_flxsurf_avg(t, species, kx, ri) ;
+		tperp_flxsurf_avg:description = "The perturbed perpendicular temperature flux surface averaged:  averaged over theta, at ky=0 (actally ik==1),  as a function of kx" ;
+		tperp_flxsurf_avg:units = "T_r" ;
+	double tperp(species, ky, kx, theta, ri) ;
+		tperp:description = "The perturbed perpendicular temperature" ;
+		tperp:units = "T_r" ;
+	double tperp_igomega_by_mode(t, species, ky, kx, ri) ;
+		tperp_igomega_by_mode:description = "The perturbed perpendicular temperature at ig=igomega, as a function of kx and ky" ;
+		tperp_igomega_by_mode:units = "T_r" ;
+	double tperp_by_mode(t, species, ky, kx, ri) ;
+		tperp_by_mode:description = "The perturbed perpendicular temperature  averaged over theta, as a function of kx and ky" ;
+		tperp_by_mode:units = "T_r" ;
+	double tperp2_by_mode(t, species, ky, kx) ;
+		tperp2_by_mode:description = "The perturbed perpendicular temperature squared and averaged over theta, as a function of kx and ky" ;
+		tperp2_by_mode:units = "T_r" ;
+	double qparflux2_by_ky(t, species, ky) ;
+		qparflux2_by_ky:description = "The parallel heat flux squared and averaged over theta and kx" ;
+		qparflux2_by_ky:units = "(n_r T_r v_thr)^2" ;
+	double qparflux2_by_kx(t, species, kx) ;
+		qparflux2_by_kx:description = "The parallel heat flux squared and averaged over theta and ky" ;
+		qparflux2_by_kx:units = "(n_r T_r v_thr)^2" ;
+	double qparflux2(t, species) ;
+		qparflux2:description = "The parallel heat flux squared and averaged over theta, kx and ky" ;
+		qparflux2:units = "(n_r T_r v_thr)^2" ;
+	double qparflux_flxsurf_avg(t, species, kx, ri) ;
+		qparflux_flxsurf_avg:description = "The parallel heat flux flux surface averaged:  averaged over theta, at ky=0 (actally ik==1),  as a function of kx" ;
+		qparflux_flxsurf_avg:units = "n_r T_r v_thr" ;
+	double qparflux(species, ky, kx, theta, ri) ;
+		qparflux:description = "The parallel heat flux" ;
+		qparflux:units = "n_r T_r v_thr" ;
+	double qparflux_igomega_by_mode(t, species, ky, kx, ri) ;
+		qparflux_igomega_by_mode:description = "The parallel heat flux at ig=igomega, as a function of kx and ky" ;
+		qparflux_igomega_by_mode:units = "n_r T_r v_thr" ;
+	double qparflux_by_mode(t, species, ky, kx, ri) ;
+		qparflux_by_mode:description = "The parallel heat flux  averaged over theta, as a function of kx and ky" ;
+		qparflux_by_mode:units = "n_r T_r v_thr" ;
+	double qparflux2_by_mode(t, species, ky, kx) ;
+		qparflux2_by_mode:description = "The parallel heat flux squared and averaged over theta, as a function of kx and ky" ;
+		qparflux2_by_mode:units = "n_r T_r v_thr" ;
+	double pperpj12_by_ky(t, species, ky) ;
+		pperpj12_by_ky:description = "A modified perpendicular pressure which give the particle flux from bpar squared and averaged over theta and kx" ;
+		pperpj12_by_ky:units = "(n_r T_r / e)^2" ;
+	double pperpj12_by_kx(t, species, kx) ;
+		pperpj12_by_kx:description = "A modified perpendicular pressure which give the particle flux from bpar squared and averaged over theta and ky" ;
+		pperpj12_by_kx:units = "(n_r T_r / e)^2" ;
+	double pperpj12(t, species) ;
+		pperpj12:description = "A modified perpendicular pressure which give the particle flux from bpar squared and averaged over theta, kx and ky" ;
+		pperpj12:units = "(n_r T_r / e)^2" ;
+	double pperpj1_flxsurf_avg(t, species, kx, ri) ;
+		pperpj1_flxsurf_avg:description = "A modified perpendicular pressure which give the particle flux from bpar flux surface averaged:  averaged over theta, at ky=0 (actally ik==1),  as a function of kx" ;
+		pperpj1_flxsurf_avg:units = "n_r T_r / e" ;
+	double pperpj1(species, ky, kx, theta, ri) ;
+		pperpj1:description = "A modified perpendicular pressure which give the particle flux from bpar" ;
+		pperpj1:units = "n_r T_r / e" ;
+	double pperpj1_igomega_by_mode(t, species, ky, kx, ri) ;
+		pperpj1_igomega_by_mode:description = "A modified perpendicular pressure which give the particle flux from bpar at ig=igomega, as a function of kx and ky" ;
+		pperpj1_igomega_by_mode:units = "n_r T_r / e" ;
+	double pperpj1_by_mode(t, species, ky, kx, ri) ;
+		pperpj1_by_mode:description = "A modified perpendicular pressure which give the particle flux from bpar  averaged over theta, as a function of kx and ky" ;
+		pperpj1_by_mode:units = "n_r T_r / e" ;
+	double pperpj12_by_mode(t, species, ky, kx) ;
+		pperpj12_by_mode:description = "A modified perpendicular pressure which give the particle flux from bpar squared and averaged over theta, as a function of kx and ky" ;
+		pperpj12_by_mode:units = "n_r T_r / e" ;
+	double qpperpj12_by_ky(t, species, ky) ;
+		qpperpj12_by_ky:description = "A modified perpendicular pressure * energy which give the heat flux from bpar squared and averaged over theta and kx" ;
+		qpperpj12_by_ky:units = "(n_r T_r^2 / e)^2" ;
+	double qpperpj12_by_kx(t, species, kx) ;
+		qpperpj12_by_kx:description = "A modified perpendicular pressure * energy which give the heat flux from bpar squared and averaged over theta and ky" ;
+		qpperpj12_by_kx:units = "(n_r T_r^2 / e)^2" ;
+	double qpperpj12(t, species) ;
+		qpperpj12:description = "A modified perpendicular pressure * energy which give the heat flux from bpar squared and averaged over theta, kx and ky" ;
+		qpperpj12:units = "(n_r T_r^2 / e)^2" ;
+	double qpperpj1_flxsurf_avg(t, species, kx, ri) ;
+		qpperpj1_flxsurf_avg:description = "A modified perpendicular pressure * energy which give the heat flux from bpar flux surface averaged:  averaged over theta, at ky=0 (actally ik==1),  as a function of kx" ;
+		qpperpj1_flxsurf_avg:units = "n_r T_r^2 / e" ;
+	double qpperpj1(species, ky, kx, theta, ri) ;
+		qpperpj1:description = "A modified perpendicular pressure * energy which give the heat flux from bpar" ;
+		qpperpj1:units = "n_r T_r^2 / e" ;
+	double qpperpj1_igomega_by_mode(t, species, ky, kx, ri) ;
+		qpperpj1_igomega_by_mode:description = "A modified perpendicular pressure * energy which give the heat flux from bpar at ig=igomega, as a function of kx and ky" ;
+		qpperpj1_igomega_by_mode:units = "n_r T_r^2 / e" ;
+	double qpperpj1_by_mode(t, species, ky, kx, ri) ;
+		qpperpj1_by_mode:description = "A modified perpendicular pressure * energy which give the heat flux from bpar  averaged over theta, as a function of kx and ky" ;
+		qpperpj1_by_mode:units = "n_r T_r^2 / e" ;
+	double qpperpj12_by_mode(t, species, ky, kx) ;
+		qpperpj12_by_mode:description = "A modified perpendicular pressure * energy which give the heat flux from bpar squared and averaged over theta, as a function of kx and ky" ;
+		qpperpj12_by_mode:units = "n_r T_r^2 / e" ;
+	double phi_corr_2pi(t, ky, theta, ri) ;
+		phi_corr_2pi:description = "2 point correlation function calculated from the electric potential  as a function of ky and parallel sep" ;
+		phi_corr_2pi:units = "1" ;
+
+// global attributes:
+		:title = "\n",
+			"                                                   \n",
+			"=================================================  \n",
+			"                GS2 Output File                    \n",
+			"=================================================  \n",
+			"                                                   " ;
+		:file_description = "\n",
+			"                                                   \n",
+			" This file contains output from the gyrokinetic    \n",
+			" flux tube code GS2. GS2 is a code                 \n",
+			" which evolves the gyrokinetic equation,           \n",
+			" which describes the behaviour of a strongly       \n",
+			" magnetized plasma.                                \n",
+			" Among other information this file may contain:    \n",
+			" (*) Values of geometric coefficients.             \n",
+			" (*) Values of the electromagnetic fields.         \n",
+			" (*) Values of linear growth rates.                \n",
+			" (*) Values of turbulent fluxes.                   \n",
+			" (*) Values of moments such as density,            \n",
+			"         parallel flow and temperature.            \n",
+			" The details of what is contained are controlled   \n",
+			" by the namelist diagnostics_config.               \n",
+			"                                                   " ;
+		:data_description = "\n",
+			"                                                   \n",
+			" Most data consists of physical quantities given   \n",
+			" as a function of one more of the five dimensions  \n",
+			" in the GK eqn: theta, kx, ky, energy and lamda.   \n",
+			" Data is typically double precision real numbers.  \n",
+			" Complex numbers are handled by having an extra    \n",
+			" dimension ri.                                     \n",
+			"                                                   " ;
+		:normalization_description = "\n",
+			"                                                   \n",
+			" Quantities in this file are given in              \n",
+			" dimensionless form.  Dimensional quantities can   \n",
+			" be reconstructed from these dimensionless         \n",
+			" quantities by multiplying by the expression       \n",
+			" given in the units attribute. This expression     \n",
+			" is constructed from one or more of the following  \n",
+			" normalising quantities:                           \n",
+			" (*) a_ref: the normalising length                 \n",
+			"       (this is half-diameter of                   \n",
+			"       the LCFS for numerical equilibria           \n",
+			"       but has no physical meaning                 \n",
+			"       in Miller, circular and slab geometries)    \n",
+			" (*) B_ref: the normalising field                  \n",
+			"       (this is the field on the magnetic          \n",
+			"       axis for numerical equilibria               \n",
+			"       but has no physical meaning in              \n",
+			"       Miller, circular and slab geometries)       \n",
+			" (*) Properties of the reference species (a        \n",
+			"       hypothetical species whose properties       \n",
+			"       may be equal to one or none of the species  \n",
+			"       in the simulation):                         \n",
+			"    (*) T_ref: the reference temperature           \n",
+			"    (*) n_ref: the reference density               \n",
+			"    (*) n_ref: the reference mass                  \n",
+			"    (*) Z_ref: the reference charge, which         \n",
+			"          is always equal to the proton charge     \n",
+			" (*) vth_ref = sqrt(2 T_ref/m_ref).                \n",
+			" (*) rho_ref = vth_ref / (Z_ref B_ref / m_ref c)   \n",
+			"                                                   " ;
+		:gs2_help = "\n",
+			"                                                   \n",
+			" At the time of writing you can obtain             \n",
+			" help for using GS2 in the following               \n",
+			" places:                                           \n",
+			" (*) http://gyrokinetics.sourceforge.net/wiki      \n",
+			"       (User help: installing, running)            \n",
+			" (*) http://gyrokinetics.sourceforge.net/gs2_documentation/ \n",
+			"       (Doxygen documentation)                     \n",
+			" (*) http://sourceforge.net/projects/gyrokinetics  \n",
+			"       (Downloads, bug tracker)                    \n",
+			"                                                   " ;
+		:input_file_extraction = "\n",
+			"                                                   \n",
+			" A bash utility for extracting the input file      \n",
+			" from this file is included in the scripts         \n",
+			" folder in the GS2 source. To invoke it:           \n",
+			" $ ./extract_input_file <netcdf_file>              \n",
+			"                                                   " ;
+		:user_comments = "" ;
+		:git_hash = "aff3649e42f01040742dafe2d50530bc17856a26" ;
+		:git_state_modified = "modified" ;
+		:build_identifier = "debian-sid.gfortran.aff3649" ;
+		:release_info = "\n",
+			"This is not an official release (presumably        \n",
+			"a development version)                             " ;
+		:creation_time = "Mon Nov 12 12:05:56 2018 -0500" ;
+		:creation_time_in_seconds_after_epoch = 1542042356 ;
+		:simpledatio_info = "This datafile was constructed using simpledatio, a simplified netCDF interface." ;
+		:simpledatio_url = "http://github.com/edmundhighcock/simpledataio" ;
+		:simpledatio_version = "1.0.0" ;
+		:netcdf_version = "4.6.1 of Aug  1 2018 05:36:48 $" ;
+		:netcdf_url = "http://www.unidata.ucar.edu/software/netcdf" ;
+data:
+
+ phi2_by_mode =
+  1.9936940067918e-07,
+  2.0488099112342e-07,
+  2.13175164235562e-07,
+  1.88411201783246e-07,
+  2.11492999400339e-07,
+  1.74308682247138e-07,
+  2.01019621814612e-07,
+  1.70620108498825e-07,
+  5.5577229530823e-09,
+  2.45427183718219e-10,
+  1.25905948267741e-09,
+  8.65938125216408e-09,
+  3.4190748827156e-08,
+  1.8414785430866e-08,
+  1.05462268845389e-09,
+  1.19751837053385e-10,
+  5.42814848870516e-09,
+  2.34114137027621e-10,
+  1.22014480507905e-09,
+  8.35911436559806e-09,
+  3.28256641604674e-08,
+  1.75668824610468e-08,
+  9.86823407432226e-10,
+  1.09016041476848e-10,
+  5.3126117656923e-09,
+  2.33605196339133e-10,
+  1.19113872794419e-09,
+  8.07253047427458e-09,
+  3.15289152882608e-08,
+  1.67857847832763e-08,
+  9.40955194691877e-10,
+  1.05682700699278e-10,
+  5.20419943467904e-09,
+  2.2592649548374e-10,
+  1.15102162074059e-09,
+  7.79988392958193e-09,
+  3.02995347124487e-08,
+  1.60507749658295e-08,
+  9.06106583472513e-10,
+  1.04655379306212e-10,
+  5.08959469482638e-09,
+  2.15235231274248e-10,
+  1.11030522976406e-09,
+  7.52058587884794e-09,
+  2.90990014272979e-08,
+  1.53250668889087e-08,
+  8.53204179744694e-10,
+  9.16554708599701e-11,
+  4.979660528721e-09,
+  2.10337373787168e-10,
+  1.08246745638913e-09,
+  7.26173426738336e-09,
+  2.79562996632101e-08,
+  1.46438863338277e-08,
+  8.18540562015605e-10,
+  8.88334222415445e-11,
+  4.87807846688549e-09,
+  2.08859102417835e-10,
+  1.05626924878136e-09,
+  7.01578554397006e-09,
+  2.68612668120024e-08,
+  1.3995134083866e-08,
+  7.70043415881029e-10,
+  7.97801756246974e-11,
+  4.76849363135373e-09,
+  1.98633137568015e-10,
+  1.01562596405885e-09,
+  6.76713409574458e-09,
+  2.57882073779016e-08,
+  1.33549641216769e-08,
+  7.25174640905318e-10,
+  7.32868601675393e-11,
+  4.66894213697431e-09,
+  1.9477915063874e-10,
+  9.82725231801665e-10,
+  6.53497603301346e-09,
+  2.47696676892788e-08,
+  1.27580300186804e-08,
+  6.93625268714974e-10,
+  7.27842475257213e-11,
+  4.56976467030595e-09,
+  1.97889868361161e-10,
+  9.64510843970103e-10,
+  6.31384205952771e-09,
+  2.37954543452854e-08,
+  1.2194235428053e-08,
+  6.64430534816014e-10,
+  7.20662736939001e-11,
+  4.48573417825709e-09,
+  1.96923604353744e-10,
+  9.34634985783643e-10,
+  6.10616963960656e-09,
+  2.28923833053959e-08,
+  1.1686939527869e-08,
+  6.44991187914778e-10,
+  7.17979268918864e-11,
+  4.37220014268227e-09,
+  1.76112416143285e-10,
+  8.96233980135333e-10,
+  5.88089394240554e-09,
+  2.19534555006144e-08,
+  1.11275051399096e-08,
+  6.02741757384474e-10,
+  6.02222606004689e-11,
+  4.29126141948535e-09,
+  1.84244440095414e-10,
+  8.77601239247571e-10,
+  5.69042562355402e-09,
+  2.10947019016358e-08,
+  1.06393162027201e-08,
+  5.74670562901709e-10,
+  6.74487103071559e-11,
+  4.19678946205492e-09,
+  1.74948388729257e-10,
+  8.49926105283623e-10,
+  5.49047269684151e-09,
+  2.02553349348299e-08,
+  1.01523957107342e-08,
+  5.36264087827969e-10,
+  6.07745353850287e-11,
+  4.10347382985053e-09,
+  1.66445158738555e-10,
+  8.20486547660825e-10,
+  5.29576273156848e-09,
+  1.94605053632207e-08,
+  9.70590082908058e-09,
+  5.15751288549003e-10,
+  6.15694991067097e-11,
+  4.01748340041106e-09,
+  1.64757959394947e-10,
+  7.98428475518651e-10,
+  5.12248435182042e-09,
+  1.86959370674808e-08,
+  9.28098960211171e-09,
+  4.95488440071487e-10,
+  6.45250910959068e-11,
+  3.93485297872603e-09,
+  1.61708094742505e-10,
+  7.74634611327013e-10,
+  4.94262738459303e-09,
+  1.79563055794415e-08,
+  8.85773090766671e-09,
+  4.66541218416964e-10,
+  5.12616514711322e-11,
+  3.85057115786148e-09,
+  1.56448339576493e-10,
+  7.49542408720548e-10,
+  4.76786493429002e-09,
+  1.72468765442702e-08,
+  8.45802625067788e-09,
+  4.3822801475406e-10,
+  4.89453186225061e-11,
+  3.77010906774789e-09,
+  1.53047665406254e-10,
+  7.26291512770355e-10,
+  4.60236390938304e-09,
+  1.65648715443018e-08,
+  8.07808585175787e-09,
+  4.12327526604981e-10,
+  4.41864218079763e-11,
+  3.68697631723265e-09,
+  1.4779592218132e-10,
+  7.06463523096525e-10,
+  4.44523231275695e-09,
+  1.59184201449784e-08,
+  7.72570206116166e-09,
+  4.0127632429501e-10,
+  4.70957281889325e-11,
+  3.60364467348506e-09,
+  1.40949815188048e-10,
+  6.86151290530938e-10,
+  4.29129879352716e-09,
+  1.52876728959697e-08,
+  7.37674555928261e-09,
+  3.80306148015444e-10,
+  4.3497143950978e-11,
+  3.53058480216451e-09,
+  1.38589751646223e-10,
+  6.68281477722226e-10,
+  4.14509714532165e-09,
+  1.46840997023502e-08,
+  7.0472303167564e-09,
+  3.57787776411245e-10,
+  3.65832383541936e-11,
+  3.46339748217775e-09,
+  1.40925541914394e-10,
+  6.47496556002205e-10,
+  4.00365941218541e-09,
+  1.41078524522673e-08,
+  6.73699784225751e-09,
+  3.48735745366547e-10,
+  5.02774438057107e-11,
+  3.38533766739961e-09,
+  1.33344200924508e-10,
+  6.25463065476158e-10,
+  3.86145190123685e-09,
+  1.35469483965569e-08,
+  6.42864208673745e-09,
+  3.22206355883696e-10,
+  3.73975829471134e-11,
+  3.30919882899191e-09,
+  1.28415845257676e-10,
+  6.06814677256841e-10,
+  3.72973978213037e-09,
+  1.30148259219106e-08,
+  6.14613385961733e-09,
+  3.15208567357913e-10,
+  4.58184006317664e-11,
+  3.23746462711866e-09,
+  1.24586825674028e-10,
+  5.87944536766164e-10,
+  3.60391270865534e-09,
+  1.25018339967483e-08,
+  5.86914592336254e-09,
+  2.91510458559247e-10,
+  3.27318567998795e-11,
+  3.16810863761851e-09,
+  1.22052489035898e-10,
+  5.72608051915145e-10,
+  3.48105476533567e-09,
+  1.20094104412031e-08,
+  5.60951465281548e-09,
+  2.85104925906828e-10,
+  4.38070547594517e-11,
+  3.11364450424576e-09,
+  1.29225612489764e-10,
+  5.63937753279063e-10,
+  3.37489776079592e-09,
+  1.15608931454989e-08,
+  5.39359768298635e-09,
+  2.99919079719218e-10,
+  6.98541617581563e-11,
+  3.03764108391402e-09,
+  1.19282061120193e-10,
+  5.42085862932821e-10,
+  3.24711440954416e-09,
+  1.10829940216907e-08,
+  5.12298713823852e-09,
+  2.61496413471537e-10,
+  4.63744237082662e-11,
+  2.97471025407589e-09,
+  1.15834593407966e-10,
+  5.25740409550853e-10,
+  3.13525927906127e-09,
+  1.0649409041146e-08,
+  4.9009597713299e-09,
+  2.57178260685129e-10,
+  5.45587129427757e-11,
+  2.90855322616095e-09,
+  1.10644169423953e-10,
+  5.08465456639099e-10,
+  3.02589007985854e-09,
+  1.02268006078892e-08,
+  4.67933619514808e-09,
+  2.45252041741528e-10,
+  5.56288621682021e-11,
+  2.8462018945258e-09,
+  1.06550867720128e-10,
+  4.94208242212061e-10,
+  2.92362629740303e-09,
+  9.82996007141869e-09,
+  4.47641341785361e-09,
+  2.30945239881996e-10,
+  4.11874013482799e-11,
+  2.79418216936177e-09,
+  1.12183362906722e-10,
+  4.88816393123216e-10,
+  2.82912397573815e-09,
+  9.44081541386579e-09,
+  4.27618275218014e-09,
+  2.29821124340814e-10,
+  7.46620034522263e-11,
+  2.73040918219586e-09,
+  1.04819200858143e-10,
+  4.73392098338878e-10,
+  2.72966389305282e-09,
+  9.066288527755e-09,
+  4.08326625210984e-09,
+  2.08568776255888e-10,
+  4.99024168627556e-11,
+  2.67660714821581e-09,
+  1.05450244087767e-10,
+  4.60218742679339e-10,
+  2.63804046212458e-09,
+  8.70788493923273e-09,
+  3.90246816947666e-09,
+  2.07501445761602e-10,
+  7.0486208583529e-11,
+  2.62347205999669e-09,
+  1.09119089577529e-10,
+  4.45376279174735e-10,
+  2.54818406977599e-09,
+  8.37115788831874e-09,
+  3.73716436867518e-09,
+  2.11771352267153e-10,
+  9.64244808489711e-11,
+  2.56083782768897e-09,
+  9.81967001480159e-11,
+  4.28255122674522e-10,
+  2.45316762746148e-09,
+  8.03361458644147e-09,
+  3.55601142841545e-09,
+  1.86243627963728e-10,
+  7.51670065636259e-11,
+  2.50416003777451e-09,
+  9.62081361401278e-11,
+  4.14619408042867e-10,
+  2.366517945262e-09,
+  7.71513454766254e-09,
+  3.39395315768862e-09,
+  1.73258764442913e-10,
+  7.38161353981617e-11,
+  2.45151223201011e-09,
+  9.44806699248036e-11,
+  4.00530275461274e-10,
+  2.29255892119719e-09,
+  7.42040018047451e-09,
+  3.25838139399397e-09,
+  1.8615497329694e-10,
+  9.8666737607342e-11,
+  2.39935778306235e-09,
+  9.20071189766495e-11,
+  3.8715358295213e-10,
+  2.20791514617711e-09,
+  7.12193379864552e-09,
+  3.10017203019873e-09,
+  1.68968554239318e-10,
+  9.85838124347719e-11,
+  2.34672100021223e-09,
+  8.83250914319248e-11,
+  3.75989513734309e-10,
+  2.13528842851333e-09,
+  6.84884227238093e-09,
+  2.97487889161245e-09,
+  1.78321387159406e-10,
+  1.22477573600193e-10,
+  2.29935583628971e-09,
+  9.15316007600765e-11,
+  3.65879025957819e-10,
+  2.05929365668995e-09,
+  6.57315694822237e-09,
+  2.8301690810506e-09,
+  1.62070606156217e-10,
+  1.26912122950676e-10,
+  2.25498049263031e-09,
+  9.38671344957731e-11,
+  3.56869148297819e-10,
+  1.98962703333777e-09,
+  6.31822378477931e-09,
+  2.70781997098091e-09,
+  1.64792147248847e-10,
+  1.50027042394868e-10,
+  2.20227804863667e-09,
+  8.82836152426316e-11,
+  3.45592692742934e-10,
+  1.91855069267553e-09,
+  6.06461291365827e-09,
+  2.58259339578606e-09,
+  1.52475160546856e-10,
+  1.52569952407358e-10,
+  2.15802202398224e-09,
+  9.01584311006517e-11,
+  3.39110887959202e-10,
+  1.85613444661266e-09,
+  5.83225101003471e-09,
+  2.47669922828045e-09,
+  1.65885407012078e-10,
+  1.88389729961343e-10,
+  2.113154252059e-09,
+  9.03536267448725e-11,
+  3.2827388721741e-10,
+  1.79137940409424e-09,
+  5.59971687762321e-09,
+  2.35979816743633e-09,
+  1.51971606619595e-10,
+  1.9194181524192e-10,
+  2.0632833235221e-09,
+  8.22460277080084e-11,
+  3.16390868988964e-10,
+  1.72962665077583e-09,
+  5.3795615831349e-09,
+  2.26303824319306e-09,
+  1.54338844299161e-10,
+  2.00491647626118e-10,
+  2.02378573801204e-09,
+  8.82559386536258e-11,
+  3.09672575031493e-10,
+  1.67158650972723e-09,
+  5.17244909992154e-09,
+  2.15900211389668e-09,
+  1.66013928146827e-10,
+  2.47076267782878e-10,
+  1.97952009636874e-09,
+  8.58152290758085e-11,
+  2.99865398303187e-10,
+  1.6140259771641e-09,
+  4.97061177487112e-09,
+  2.06190926026809e-09,
+  1.68735290090153e-10,
+  2.64807203695019e-10,
+  1.93312928165094e-09,
+  7.80398444300185e-11,
+  2.89115717220125e-10,
+  1.55618331656056e-09,
+  4.77050264056032e-09,
+  1.97159495173456e-09,
+  1.57754213613551e-10,
+  2.57123166364218e-10,
+  1.90011505505823e-09,
+  8.7382064267896e-11,
+  2.83007759790077e-10,
+  1.50427997166894e-09,
+  4.59114414095137e-09,
+  1.88095590654125e-09,
+  1.75625288315955e-10,
+  3.00993019469854e-10,
+  1.85322890006558e-09,
+  8.00321283431e-11,
+  2.75239488429446e-10,
+  1.44912595311223e-09,
+  4.40194992650172e-09,
+  1.7962263274026e-09,
+  1.57267725707451e-10,
+  2.86258292872715e-10,
+  1.82065074882702e-09,
+  9.46090331488104e-11,
+  2.76880583545379e-10,
+  1.40442869341414e-09,
+  4.25125174320635e-09,
+  1.72400831776058e-09,
+  2.12915175518863e-10,
+  3.97864712961891e-10,
+  1.77859448698117e-09,
+  9.10310951012158e-11,
+  2.63556955054624e-10,
+  1.35280856189798e-09,
+  4.07534773253296e-09,
+  1.64255800426592e-09,
+  1.99371612469243e-10,
+  4.04791623009483e-10,
+  1.74040363599828e-09,
+  9.20204480113508e-11,
+  2.5610932860231e-10,
+  1.30637446951236e-09,
+  3.90678105942931e-09,
+  1.56847719989309e-09,
+  1.89283476098993e-10,
+  4.22022936953595e-10,
+  1.70448684397168e-09,
+  9.78314993130659e-11,
+  2.52415684711329e-10,
+  1.26279739158785e-09,
+  3.76141044061043e-09,
+  1.50171309107665e-09,
+  2.17714159445539e-10,
+  5.00365383532802e-10,
+  1.66605964881791e-09,
+  9.27064253890588e-11,
+  2.43446753030327e-10,
+  1.21866382241601e-09,
+  3.60982142449528e-09,
+  1.432067365553e-09,
+  2.14917275536851e-10,
+  5.29797742349441e-10,
+  1.63350131822954e-09,
+  9.25589592744258e-11,
+  2.37479144834658e-10,
+  1.17832951739995e-09,
+  3.46061708189505e-09,
+  1.36717486537921e-09,
+  2.15297539436757e-10,
+  5.65395308352118e-10,
+  1.59494491805572e-09,
+  8.38897449604258e-11,
+  2.26843485361999e-10,
+  1.13548737869321e-09,
+  3.33458490752607e-09,
+  1.31044596127113e-09,
+  2.44296226283027e-10,
+  6.38600129810196e-10,
+  1.56304972903627e-09,
+  8.92201525277538e-11,
+  2.25184244993561e-10,
+  1.09820873168124e-09,
+  3.20835911930535e-09,
+  1.25575180034249e-09,
+  2.85431543759448e-10,
+  7.29655391823188e-10,
+  1.53277314828927e-09,
+  8.65852725695424e-11,
+  2.18651690959692e-10,
+  1.0612282499524e-09,
+  3.07293863347392e-09,
+  1.19651601766587e-09,
+  2.9114250501493e-10,
+  7.72651344238912e-10,
+  1.49765934481132e-09,
+  8.18940597346838e-11,
+  2.10755421964275e-10,
+  1.02340837666791e-09,
+  2.95700242516333e-09,
+  1.14581229019207e-09,
+  3.0523002390838e-10,
+  8.13260107562746e-10,
+  1.46558363622899e-09,
+  8.64186759365246e-11,
+  2.08215654274694e-10,
+  9.89180471642217e-10,
+  2.85212035953065e-09,
+  1.09856179931228e-09,
+  3.59733024360958e-10,
+  9.35193078986557e-10,
+  1.43319343194797e-09,
+  8.9097160520659e-11,
+  2.04704672130647e-10,
+  9.56081316613475e-10,
+  2.75247618852602e-09,
+  1.05397269536085e-09,
+  4.0125152901368e-10,
+  1.04262933803472e-09,
+  1.40584977630539e-09,
+  1.02925504835066e-10,
+  2.04983291210948e-10,
+  9.24759216779802e-10,
+  2.66053737969054e-09,
+  1.01246935793908e-09,
+  4.51859527870696e-10,
+  1.17294793715141e-09,
+  1.38119379463776e-09,
+  1.15923319766773e-10,
+  2.06598286894201e-10,
+  8.97201495580189e-10,
+  2.53821356583255e-09,
+  9.72974401146743e-10,
+  4.69458566567273e-10,
+  1.28922414990586e-09,
+  1.34944848592837e-09,
+  1.18952988599086e-10,
+  2.01239620933008e-10,
+  8.65354561979809e-10,
+  2.45906343063873e-09,
+  9.31395194201788e-10,
+  5.20851172271249e-10,
+  1.44688169058791e-09,
+  1.32499543212567e-09,
+  1.33222641057868e-10,
+  2.0478160694471e-10,
+  8.42489212349508e-10,
+  2.36095887881169e-09,
+  9.00354068760945e-10,
+  5.76118050136986e-10,
+  1.64565890730186e-09,
+  1.29610100762972e-09,
+  1.22430032961425e-10,
+  1.96308509564308e-10,
+  8.13792230533025e-10,
+  2.25920378744701e-09,
+  8.54449114491701e-10,
+  5.82392006089583e-10,
+  1.77956891124289e-09,
+  1.26874762473109e-09,
+  1.17185022278855e-10,
+  1.89795764371148e-10,
+  7.84104432512609e-10,
+  2.17686958548024e-09,
+  8.13657630202922e-10,
+  6.14009441862009e-10,
+  1.93910964557633e-09,
+  1.24310835713943e-09,
+  1.22103668356547e-10,
+  1.91276176102259e-10,
+  7.60450103947909e-10,
+  2.09866149964183e-09,
+  7.88257188227394e-10,
+  7.05776747723366e-10,
+  2.23717708310188e-09,
+  1.22135584247856e-09,
+  1.32488473629161e-10,
+  1.9385582935031e-10,
+  7.40371212242584e-10,
+  2.01790901451276e-09,
+  7.64023837043579e-10,
+  7.91100841269452e-10,
+  2.53882450206881e-09,
+  1.19442225632293e-09,
+  1.2088242327346e-10,
+  1.85295674851812e-10,
+  7.12867717555592e-10,
+  1.92783030542507e-09,
+  7.20421918729805e-10,
+  8.03733644532242e-10,
+  2.73636666296289e-09,
+  1.16812584664515e-09,
+  1.24598636703162e-10,
+  1.85674340815452e-10,
+  6.89899757029565e-10,
+  1.87233433570831e-09,
+  7.06679495257444e-10,
+  9.48316667853623e-10,
+  3.16958667354136e-09,
+  1.14068014694037e-09,
+  1.142024565717e-10,
+  1.75601160658662e-10,
+  6.6136946448479e-10,
+  1.79625965487835e-09,
+  6.64595328378101e-10,
+  9.64018950950983e-10,
+  3.40875832255413e-09,
+  1.12412953245926e-09,
+  1.41684829010678e-10,
+  1.86538533748701e-10,
+  6.51401995353455e-10,
+  1.72734344057008e-09,
+  6.58554224913127e-10,
+  1.12716378542385e-09,
+  3.95699631535433e-09,
+  1.09792978586588e-09,
+  1.41791962735444e-10,
+  1.80977380034994e-10,
+  6.27715915109594e-10,
+  1.67334098425476e-09,
+  6.3510114991393e-10,
+  1.23260893949307e-09,
+  4.40919935863731e-09,
+  1.07323013887812e-09,
+  1.33861909199235e-10,
+  1.73083035678612e-10,
+  6.03430039912649e-10,
+  1.6080432074628e-09,
+  6.05647240184333e-10,
+  1.32796669443744e-09,
+  4.90883724429527e-09,
+  1.05338296044815e-09,
+  1.27301603829168e-10,
+  1.65899361334023e-10,
+  5.80888021775834e-10,
+  1.52054920447787e-09,
+  5.55667051491939e-10,
+  1.30762305105707e-09,
+  5.25129279585578e-09,
+  1.03114261453887e-09,
+  1.43571617879084e-10,
+  1.72029769128879e-10,
+  5.67044365803814e-10,
+  1.48085865837551e-09,
+  5.55585266991525e-10,
+  1.52335235092646e-09,
+  6.03061468874018e-09,
+  1.01009584550117e-09,
+  1.46422857827456e-10,
+  1.69555081676978e-10,
+  5.5048749318599e-10,
+  1.41859251433306e-09,
+  5.33143382965597e-10,
+  1.64303933283995e-09,
+  6.73326187156649e-09,
+  9.85615951556903e-10,
+  1.43037747864316e-10,
+  1.64865522354097e-10,
+  5.30039311163708e-10,
+  1.37376802382164e-09,
+  5.1567322356577e-10,
+  1.77431111866824e-09,
+  7.47459809879808e-09,
+  9.68584833766298e-10,
+  1.55406942046724e-10,
+  1.6897832152654e-10,
+  5.18560971993374e-10,
+  1.32443635823699e-09,
+  5.07043117286017e-10,
+  1.9685481681462e-09,
+  8.43462298409411e-09,
+  9.54481880492921e-10,
+  1.71694368077902e-10,
+  1.75365067325521e-10,
+  5.10363046909062e-10,
+  1.262030653319e-09,
+  4.86795151700045e-10,
+  2.1220603137881e-09,
+  9.43510339574508e-09,
+  9.32934842040588e-10,
+  1.70677698754402e-10,
+  1.7107791186258e-10,
+  4.92381044866649e-10,
+  1.21962769094606e-09,
+  4.71331560485172e-10,
+  2.29516090962252e-09,
+  1.04697106276854e-08,
+  9.15127996453853e-10,
+  1.65915744750526e-10,
+  1.63801408269823e-10,
+  4.73482863843897e-10,
+  1.15526253191316e-09,
+  4.32877208043599e-10,
+  2.38593908665747e-09,
+  1.15103251050309e-08,
+  8.93747343465777e-10,
+  1.75618222113522e-10,
+  1.68134668412885e-10,
+  4.63754278274125e-10,
+  1.126870646969e-09,
+  4.37726274334046e-10,
+  2.69137847111758e-09,
+  1.29700854129486e-08,
+  8.7335046809587e-10,
+  1.81471081246134e-10,
+  1.68627941097775e-10,
+  4.52861114740578e-10,
+  1.09950776607337e-09,
+  4.38421140528189e-10,
+  2.98623275304646e-09,
+  1.45310679884822e-08,
+  8.59787771189627e-10,
+  1.83990635576217e-10,
+  1.63715519713162e-10,
+  4.3304060324801e-10,
+  1.0357855920931e-09,
+  3.95728646664326e-10,
+  3.12573077718406e-09,
+  1.59967086434445e-08,
+  8.48053438006511e-10,
+  2.03250835722019e-10,
+  1.68203453118257e-10,
+  4.20153441116551e-10,
+  9.91504873147269e-10,
+  3.73509179644772e-10,
+  3.33937734327686e-09,
+  1.76607656337815e-08,
+  8.29616982898277e-10,
+  2.04454261414582e-10,
+  1.65151848456079e-10,
+  4.02185386670769e-10,
+  9.4606733218573e-10,
+  3.48487896434235e-10,
+  3.547930423602e-09,
+  1.94972369524674e-08,
+  8.08845435932577e-10,
+  2.18623891968381e-10,
+  1.70556469181976e-10,
+  3.92812927742732e-10,
+  9.26650327860138e-10,
+  3.53916431625247e-10,
+  3.95033280127516e-09,
+  2.18231172261266e-08,
+  7.96564856240812e-10,
+  2.3275314719708e-10,
+  1.72733993645208e-10,
+  3.79142824009411e-10,
+  8.82272611885592e-10,
+  3.29544965894245e-10,
+  4.19706730093161e-09,
+  2.40591256532035e-08,
+  7.82843376115948e-10,
+  2.50504583558069e-10,
+  1.78536095628788e-10,
+  3.6997032021265e-10,
+  8.46219748045309e-10,
+  3.16061054128536e-10,
+  4.54365536904387e-09,
+  2.67053996839424e-08,
+  7.66037558821531e-10,
+  2.71596987444762e-10,
+  1.88657958902175e-10,
+  3.65481498383856e-10,
+  8.29874130902579e-10,
+  3.24266119983279e-10,
+  5.0648469966994e-09,
+  2.98975149290893e-08,
+  7.56633455810521e-10,
+  2.97170659460086e-10,
+  2.00214931649623e-10,
+  3.60155122671134e-10,
+  7.96114815083292e-10,
+  3.14459259661636e-10,
+  5.53340080735395e-09,
+  3.33399108011223e-08,
+  7.43599275740193e-10,
+  2.96590910128429e-10,
+  1.98151039300554e-10,
+  3.40724834272517e-10,
+  7.55355905793023e-10,
+  2.85291823033498e-10,
+  5.81669402541287e-09,
+  3.66065902993746e-08,
+  7.2883951538884e-10,
+  3.06719463240314e-10,
+  2.02141840425386e-10,
+  3.29027836362036e-10,
+  7.39010831353288e-10,
+  2.86021959656461e-10,
+  6.36270429340458e-09,
+  4.06724364192793e-08,
+  7.1195341611176e-10,
+  3.06486124106689e-10,
+  2.03269561828462e-10,
+  3.14601371841294e-10,
+  7.1394472572768e-10,
+  2.7490589669418e-10,
+  6.84978491179959e-09,
+  4.50464252116446e-08,
+  7.04334921615604e-10,
+  3.39820846212264e-10,
+  2.20761097798606e-10,
+  3.09491171017535e-10,
+  6.89704081146488e-10,
+  2.70323978834753e-10,
+  7.43618131134531e-09,
+  4.99743884633373e-08,
+  6.93036556703839e-10,
+  3.67426903543468e-10,
+  2.37619683938533e-10,
+  3.06970344823343e-10,
+  6.65633969039215e-10,
+  2.68881524184059e-10,
+  8.14745242645601e-09,
+  5.57614693437619e-08,
+  6.73219455362693e-10,
+  3.71917484607905e-10,
+  2.43096461973333e-10,
+  2.98419027007879e-10,
+  6.56109975223405e-10,
+  2.7727966392414e-10,
+  8.94429398817611e-09,
+  6.21693586233795e-08,
+  6.59068065444738e-10,
+  3.82427986010508e-10,
+  2.52018829786715e-10,
+  2.89821808874981e-10,
+  6.41461209673228e-10,
+  2.80389328429881e-10,
+  9.72969360767312e-09,
+  6.90956288094217e-08,
+  6.5472006653921e-10,
+  4.1803985757654e-10,
+  2.73364537739272e-10,
+  2.86002500221912e-10,
+  5.98738300924197e-10,
+  2.53395718082593e-10,
+  1.03917943224143e-08,
+  7.64605469625031e-08,
+  6.46342962005113e-10,
+  4.65795945500853e-10,
+  3.05269758978496e-10,
+  2.89217136373452e-10,
+  5.81323382530378e-10,
+  2.60107021332211e-10,
+  1.14144847144216e-08,
+  8.52351420653153e-08,
+  6.28905762306237e-10,
+  4.80655243906201e-10,
+  3.17615487694856e-10,
+  2.8160056272891e-10,
+  5.67944627277675e-10,
+  2.61481780998294e-10,
+  1.24322563811628e-08,
+  9.46905618670709e-08,
+  6.30527955550571e-10,
+  5.55644802029083e-10,
+  3.6654635411881e-10,
+  2.93542494695028e-10,
+  5.42761579276916e-10,
+  2.55578343229514e-10,
+  1.36000129916126e-08,
+  1.05497599149154e-07,
+  6.202213133108e-10,
+  5.86595639422134e-10,
+  3.86417068433327e-10,
+  2.89651412683614e-10,
+  5.3427321483606e-10,
+  2.59517918247303e-10,
+  1.49102419573658e-08,
+  1.17442740195409e-07,
+  6.13866425326532e-10,
+  6.06605501508574e-10,
+  4.01571256115163e-10,
+  2.78078353564778e-10,
+  5.06540963202553e-10,
+  2.38081683751089e-10,
+  1.60670882359334e-08,
+  1.30122102541651e-07,
+  5.99992624852868e-10,
+  6.25327154388744e-10,
+  4.15459402012817e-10,
+  2.66457491643872e-10,
+  5.00975075073009e-10,
+  2.39884243276947e-10,
+  1.74862801419067e-08,
+  1.44387406752122e-07,
+  6.03817901096592e-10,
+  6.84629407960573e-10,
+  4.57190827765032e-10,
+  2.68146716400511e-10,
+  4.75768303017132e-10,
+  2.24487318716386e-10,
+  1.89364237920277e-08,
+  1.60265692021629e-07,
+  5.91458139816678e-10,
+  7.22369281960648e-10,
+  4.87575510411369e-10,
+  2.64691029571176e-10,
+  4.70043729334845e-10,
+  2.26642902166389e-10,
+  2.06370107527072e-08,
+  1.78049259578705e-07,
+  5.83715075964868e-10,
+  7.79119268776141e-10,
+  5.33711143012699e-10,
+  2.71424792788454e-10,
+  4.7754571426401e-10,
+  2.44930855435488e-10,
+  2.27859321985376e-08,
+  1.98708648688239e-07,
+  5.7236100312732e-10,
+  7.92677034280089e-10,
+  5.56845775477891e-10,
+  2.65529682445111e-10,
+  4.58492033759644e-10,
+  2.3498886651498e-10,
+  2.46996746302274e-08,
+  2.20726343615691e-07,
+  5.63611578638144e-10,
+  8.56925820369283e-10,
+  6.09645145022947e-10,
+  2.75114379806434e-10,
+  4.67139344563767e-10,
+  2.5332674323632e-10,
+  2.71538413049947e-08,
+  2.45955169732568e-07,
+  5.55754489227723e-10,
+  9.22345809644997e-10,
+  6.63873540376705e-10,
+  2.87358971130977e-10,
+  4.71790562646323e-10,
+  2.69001770240987e-10,
+  2.98340264735155e-08,
+  2.74151015888589e-07,
+  5.4571285935182e-10,
+  9.467820873716e-10,
+  6.88987066306622e-10,
+  2.82697915415654e-10,
+  4.61759896442279e-10,
+  2.65618011536689e-10,
+  3.24547972229566e-08,
+  3.04535026780003e-07,
+  5.4867027013026e-10,
+  1.0113127543972e-09,
+  7.39165556348279e-10,
+  2.88439836851653e-10,
+  4.52210400736715e-10,
+  2.66726120562111e-10,
+  3.54138186226381e-08,
+  3.38511263058696e-07,
+  5.48105118245353e-10,
+  1.06298060686667e-09,
+  7.81630144067366e-10,
+  2.89186325975739e-10,
+  4.34006249677941e-10,
+  2.57808067505737e-10,
+  3.85057317221589e-08,
+  3.75918279046101e-07,
+  5.48358908061245e-10,
+  1.15321747542057e-09,
+  8.53647284419233e-10,
+  3.03788872465967e-10,
+  4.27190962663696e-10,
+  2.6147451647419e-10,
+  4.2054204233003e-08,
+  4.17857165993353e-07,
+  5.36971227247268e-10,
+  1.21681762802725e-09,
+  9.0843844703134e-10,
+  3.10827759896567e-10,
+  4.39178765341477e-10,
+  2.8015971671994e-10,
+  4.61532991430143e-08,
+  4.64960893699863e-07,
+  5.3114795514945e-10,
+  1.26306519490668e-09,
+  9.51205716096796e-10,
+  3.09701061649889e-10,
+  4.29906798030177e-10,
+  2.80737155203506e-10,
+  5.02608368502293e-08,
+  5.1636456760853e-07,
+  5.25625166121344e-10,
+  1.33615648865443e-09,
+  1.01118107064322e-09,
+  3.17147769116962e-10,
+  4.46815460068231e-10,
+  3.06255324477181e-10,
+  5.51506962017346e-08,
+  5.74434898914447e-07,
+  5.18115397977671e-10,
+  1.3846394962104e-09,
+  1.06046911262115e-09,
+  3.20939574258777e-10,
+  4.43987199414943e-10,
+  3.16140825985829e-10,
+  6.02003474470354e-08,
+  6.38490250183572e-07,
+  5.30025161402309e-10,
+  1.50620028693616e-09,
+  1.16287826630074e-09,
+  3.52153441566425e-10,
+  4.30876702405227e-10,
+  3.32465271415153e-10,
+  6.58126084604692e-08,
+  7.1021323259226e-07,
+  5.2252835389301e-10,
+  1.56054524010204e-09,
+  1.21884830016348e-09,
+  3.61172436358241e-10,
+  4.37773303987497e-10,
+  3.54953564398233e-10,
+  7.20328458799797e-08,
+  7.90069191745566e-07,
+  5.13891096213949e-10,
+  1.60941058439628e-09,
+  1.27159365023131e-09,
+  3.64785988292084e-10,
+  4.42446725408631e-10,
+  3.72379519400714e-10,
+  7.86781487746027e-08,
+  8.78360905928736e-07,
+  5.1826752233754e-10,
+  1.69991793455501e-09,
+  1.34883292370858e-09,
+  3.78310531065174e-10,
+  4.45532082860034e-10,
+  3.94247982026475e-10,
+  8.60467252407521e-08,
+  9.76821326047516e-07,
+  5.25758474027609e-10,
+  1.8052074419779e-09,
+  1.43650250557952e-09,
+  3.94265334785659e-10,
+  4.26125699122515e-10,
+  3.94781532019159e-10,
+  9.3709864707634e-08,
+  1.08519589348905e-06,
+  5.28171452713012e-10,
+  1.92376714924167e-09,
+  1.53213137656967e-09,
+  4.11138883509013e-10,
+  4.32483877517593e-10,
+  4.1517575254102e-10,
+  1.02380747450946e-07,
+  1.20601251220559e-06,
+  5.26717410690547e-10,
+  2.05061188286413e-09,
+  1.63882947063385e-09,
+  4.35871822881709e-10,
+  4.52123118879576e-10,
+  4.5554717679385e-10,
+  1.12303846596373e-07,
+  1.34190384569453e-06,
+  5.27286303721471e-10,
+  2.14972788898394e-09,
+  1.72444130101489e-09,
+  4.45661556023616e-10,
+  4.50354670875734e-10,
+  4.64264287770871e-10,
+  1.22462822259886e-07,
+  1.49075230662194e-06,
+  5.35621721579532e-10,
+  2.29488177859048e-09,
+  1.84566238436253e-09,
+  4.71054152157742e-10,
+  4.62660006295691e-10,
+  4.96093175679648e-10,
+  1.33926808136724e-07,
+  1.65719070459398e-06,
+  5.40277296171345e-10,
+  2.40670112822815e-09,
+  1.94519690655348e-09,
+  4.83298810239645e-10,
+  4.59748712427514e-10,
+  5.04530645133142e-10,
+  1.45939841844594e-07,
+  1.84071106850452e-06,
+  5.41551701024631e-10,
+  2.53718539886326e-09,
+  2.06597111108323e-09,
+  5.05956080185702e-10,
+  4.73903287971827e-10,
+  5.37754621109253e-10,
+  1.59421919451258e-07,
+  2.04578494456604e-06,
+  5.49546551533751e-10,
+  2.69519238090128e-09,
+  2.21615817125394e-09,
+  5.46275751899435e-10,
+  4.83290710953089e-10,
+  5.87560585626688e-10,
+  1.74546820604099e-07,
+  2.27576927409924e-06,
+  5.49524069803933e-10,
+  2.81172960957787e-09,
+  2.33507670856867e-09,
+  5.65639049409788e-10,
+  4.87522791296225e-10,
+  6.13480283244234e-10,
+  1.90499556505704e-07,
+  2.5297416225844e-06,
+  5.66668273656506e-10,
+  2.96326921589751e-09,
+  2.48141494034749e-09,
+  5.92727848428704e-10,
+  4.65824007057254e-10,
+  6.21487751588012e-10,
+  2.07510346019393e-07,
+  2.8109386861026e-06,
+  5.77346699844413e-10,
+  3.12627534627474e-09,
+  2.63456454284568e-09,
+  6.20306970117056e-10,
+  4.58275078181541e-10,
+  6.42769165970603e-10,
+  2.26324814752187e-07,
+  3.12445172853669e-06,
+  5.90859285273306e-10,
+  3.29582472414716e-09,
+  2.79773740216584e-09,
+  6.45674059932746e-10,
+  4.43288130546556e-10,
+  6.55457161007695e-10,
+  2.46591544376011e-07,
+  3.47205391592721e-06,
+  5.85189225437117e-10,
+  3.48293553152469e-09,
+  2.98168152004414e-09,
+  6.84080237561084e-10,
+  4.68718096696161e-10,
+  7.25012206391847e-10,
+  2.69924189853429e-07,
+  3.86234532706037e-06,
+  5.83319417648721e-10,
+  3.61523663164665e-09,
+  3.12986815711214e-09,
+  6.91183272274757e-10,
+  4.7532517234646e-10,
+  7.50323531361268e-10,
+  2.94378303323241e-07,
+  4.29301016323116e-06,
+  6.05849714977209e-10,
+  3.87602408379096e-09,
+  3.36975421818827e-09,
+  7.37304092873527e-10,
+  4.64278360313994e-10,
+  7.82878844336951e-10,
+  3.2130331948222e-07,
+  4.77293982748571e-06,
+  6.194491198792e-10,
+  4.12335088245475e-09,
+  3.60944339456927e-09,
+  7.7497952286522e-10,
+  4.45072326738284e-10,
+  7.92938692135838e-10,
+  3.50108363457227e-07,
+  5.30460961222704e-06,
+  6.24415431199122e-10,
+  4.35865223824468e-09,
+  3.84977007048414e-09,
+  8.07710535150986e-10,
+  4.48845740232508e-10,
+  8.2589451356393e-10,
+  3.81856643884508e-07,
+  5.89631919793382e-06,
+  6.37301182494886e-10,
+  4.59725816036828e-09,
+  4.09908379187526e-09,
+  8.36136230113011e-10,
+  4.59538297648448e-10,
+  8.71901027533477e-10,
+  4.16864358449629e-07,
+  6.55592260228854e-06,
+  6.40113095485592e-10,
+  4.81716643957878e-09,
+  4.34003101561958e-09,
+  8.48998017323471e-10,
+  4.70400763869111e-10,
+  8.99152422205119e-10,
+  4.54321801219549e-07,
+  7.28652649935741e-06,
+  6.50541087237718e-10,
+  5.14289954818908e-09,
+  4.67673157586175e-09,
+  9.06910925771945e-10,
+  4.83326471284391e-10,
+  9.68692121340905e-10,
+  4.96262138291204e-07,
+  8.10359997110675e-06,
+  6.75595588148855e-10,
+  5.44998221548896e-09,
+  4.99670740730476e-09,
+  9.37710981940908e-10,
+  4.71360013072869e-10,
+  9.84370452613115e-10,
+  5.4067268580087e-07,
+  9.00854074383308e-06,
+  7.02081582976132e-10,
+  5.80912487669291e-09,
+  5.36956879573839e-09,
+  9.84556331622001e-10,
+  4.54907230939476e-10,
+  1.00239903742902e-09,
+  5.88807515091614e-07,
+  1.00137604114082e-05,
+  7.20160965676761e-10,
+  6.14140033526741e-09,
+  5.73646275223848e-09,
+  1.02331604482091e-09,
+  4.52821794014457e-10,
+  1.04117629950142e-09,
+  6.41670815270042e-07,
+  1.11331524796819e-05,
+  7.30635882355443e-10,
+  6.49292504194323e-09,
+  6.13422426079044e-09,
+  1.06958464442467e-09,
+  4.47516488831822e-10,
+  1.07870810605488e-09,
+  6.99114855806566e-07,
+  1.23776568188231e-05,
+  7.52719789331209e-10,
+  6.87573943141214e-09,
+  6.57271244135187e-09,
+  1.12368371771387e-09,
+  4.27577788885153e-10,
+  1.10453817999322e-09,
+  7.61377379653762e-07,
+  1.376005709589e-05,
+  7.6119606149557e-10,
+  7.26663035030269e-09,
+  7.03413945660884e-09,
+  1.18618985698686e-09,
+  4.34465006092276e-10,
+  1.18896772112486e-09,
+  8.31059504996835e-07,
+  1.5304701390319e-05,
+  7.69648516742423e-10,
+  7.64516885279652e-09,
+  7.48668914974498e-09,
+  1.21622347926934e-09,
+  4.38824234786829e-10,
+  1.23688551423205e-09,
+  9.05783400513465e-07,
+  1.70167603138167e-05,
+  8.06695044682135e-10,
+  8.19839464419399e-09,
+  8.08844667695388e-09,
+  1.28912074255332e-09,
+  4.06080858415063e-10,
+  1.24693275698437e-09,
+  9.86730393677818e-07,
+  1.89193887676252e-05,
+  8.35441132194236e-10,
+  8.75005282176842e-09,
+  8.69135838534172e-09,
+  1.33908551111412e-09,
+  3.81529980642699e-10,
+  1.23630884108419e-09,
+  1.07396203662305e-06,
+  2.10295360503085e-05,
+  8.81740205909916e-10,
+  9.34060669340598e-09,
+  9.34006902162599e-09,
+  1.38812671170361e-09,
+  3.63497946799044e-10,
+  1.24021977287944e-09,
+  1.16939579900121e-06,
+  2.33768181691533e-05,
+  9.01272500646048e-10,
+  9.91816857652421e-09,
+  1.00063192492397e-08,
+  1.43738477132907e-09,
+  3.77737231746102e-10,
+  1.30164578008819e-09,
+  1.27500149466572e-06,
+  2.5992915561601e-05,
+  9.46043090874595e-10,
+  1.05975565288816e-08,
+  1.07761212314102e-08,
+  1.50328104200701e-09,
+  3.66864478093373e-10,
+  1.31439383617751e-09,
+  1.38846592099946e-06,
+  2.88960193931698e-05,
+  1.00277644764538e-09,
+  1.13716432297375e-08,
+  1.16546833597097e-08,
+  1.60455032300347e-09,
+  3.52425537785508e-10,
+  1.33469613695196e-09,
+  1.51269253733969e-06,
+  3.21277213918735e-05,
+  1.0344071781488e-09,
+  1.1979055116826e-08,
+  1.24247433186087e-08,
+  1.64315697418797e-09,
+  3.65388221969514e-10,
+  1.37411752017527e-09,
+  1.64750879307728e-06,
+  3.57168392872278e-05,
+  1.07732564887728e-09,
+  1.26752743720047e-08,
+  1.33062742697111e-08,
+  1.71225950908771e-09,
+  3.7679313449015e-10,
+  1.42533775155229e-09,
+  1.79487369476554e-06,
+  3.97093288624438e-05,
+  1.12713569930453e-09,
+  1.35126760200947e-08,
+  1.43372152761815e-08,
+  1.8271938898597e-09,
+  3.73856963812286e-10,
+  1.45572610742078e-09,
+  1.95527781252851e-06,
+  4.4148718229949e-05,
+  1.16671873557075e-09,
+  1.42856263544301e-08,
+  1.53341246309077e-08,
+  1.90016126415421e-09,
+  3.91083323054971e-10,
+  1.50769942300045e-09,
+  2.12986753655799e-06,
+  4.90802332284182e-05,
+  1.23236543442394e-09,
+  1.51778001483561e-08,
+  1.64595083109923e-08,
+  1.99497304094311e-09,
+  3.96343107252887e-10,
+  1.54996078078331e-09,
+  2.32037371747271e-06,
+  5.45646875586847e-05,
+  1.28961104454755e-09,
+  1.61284668000554e-08,
+  1.7682186265303e-08,
+  2.10495093454617e-09,
+  3.9450290117434e-10,
+  1.5714193265001e-09,
+  2.52717750030375e-06,
+  6.06584102534519e-05,
+  1.34148332930446e-09,
+  1.71834970723749e-08,
+  1.9044804218803e-08,
+  2.25261938982628e-09,
+  3.99892689429193e-10,
+  1.60752264517266e-09,
+  2.75325552524248e-06,
+  6.74344966422765e-05,
+  1.39487860295778e-09,
+  1.82265111501426e-08,
+  2.04418426414533e-08,
+  2.38761424050501e-09,
+  4.14779407676788e-10,
+  1.66074738115252e-09,
+  3.00020726883308e-06,
+  7.49701286497528e-05,
+  1.44104444958002e-09,
+  1.92562160191473e-08,
+  2.18709862889706e-08,
+  2.50670930685235e-09,
+  4.43193777737521e-10,
+  1.73605182125337e-09,
+  3.26941009922532e-06,
+  8.33452649111398e-05,
+  1.50990818626913e-09,
+  2.04183618433117e-08,
+  2.34760968535797e-08,
+  2.6626400395806e-09,
+  4.55813249943472e-10,
+  1.79353946078273e-09,
+  3.5624807735646e-06,
+  9.26558991090175e-05,
+  1.5707358905178e-09,
+  2.16916999839111e-08,
+  2.52289009696626e-08,
+  2.85094107249115e-09,
+  4.78677925897231e-10,
+  1.86948239202576e-09,
+  3.88292307254934e-06,
+  0.000103011414396032,
+  1.65273077876203e-09,
+  2.29106966074178e-08,
+  2.69869268808696e-08,
+  2.99715793655385e-09,
+  4.92345324060404e-10,
+  1.92950985865971e-09,
+  4.23057619534342e-06,
+  0.000114514451742051,
+  1.74628357898734e-09,
+  2.42917095338876e-08,
+  2.89480050866997e-08,
+  3.18183138295679e-09,
+  4.97665135360425e-10,
+  1.97880697776567e-09,
+  4.60915043622453e-06,
+  0.000127300292497259,
+  1.79415367267355e-09,
+  2.5704207049658e-08,
+  3.10238143746115e-08,
+  3.39304211027192e-09,
+  5.30941582900514e-10,
+  2.06455089019807e-09,
+  5.02309406865305e-06,
+  0.00014151563030392,
+  1.85917456672203e-09,
+  2.71634394424285e-08,
+  3.32161329275377e-08,
+  3.6134441055463e-09,
+  5.73097502925801e-10,
+  2.17194518204059e-09,
+  5.4757766127658e-06,
+  0.000157324266853459,
+  1.93658073426521e-09,
+  2.87084294054798e-08,
+  3.55489552168094e-08,
+  3.83378462262219e-09,
+  6.07198948545749e-10,
+  2.26737745007344e-09,
+  5.96797694084927e-06,
+  0.000174890256417863,
+  2.02079476224309e-09,
+  3.043511383957e-08,
+  3.8143592266534e-08,
+  4.11790451950965e-09,
+  6.43250915133399e-10,
+  2.36714274838659e-09,
+  6.50496562204116e-06,
+  0.000194418602972217,
+  2.11767456258742e-09,
+  3.2185751352265e-08,
+  4.08576066656188e-08,
+  4.40745663909814e-09,
+  6.87781664327629e-10,
+  2.49029260029934e-09,
+  7.09206174418307e-06,
+  0.000216138570844571,
+  2.19896691307155e-09,
+  3.39464083002965e-08,
+  4.36654987663747e-08,
+  4.67654848923163e-09,
+  7.35665926131203e-10,
+  2.61756030249176e-09,
+  7.73063533320024e-06,
+  0.000240271071148985,
+  2.30475980036122e-09,
+  3.59300186493593e-08,
+  4.68212265994624e-08,
+  5.03946861482141e-09,
+  7.60588550180192e-10,
+  2.71364823759598e-09,
+  8.42562719438217e-06,
+  0.000267095541318596,
+  2.35838641626627e-09,
+  3.7839349343076e-08,
+  5.00254474818382e-08,
+  5.39659323408042e-09,
+  8.4192810285673e-10,
+  2.89146322167338e-09,
+  9.18779620412035e-06,
+  0.000296934085783407,
+  2.43459064244202e-09,
+  3.9878268030281e-08,
+  5.34298473097682e-08,
+  5.75715633683027e-09,
+  9.19538872696693e-10,
+  3.07621178346636e-09,
+  1.00189633310173e-05,
+  0.000330102752178298,
+  2.54058147554961e-09,
+  4.21245392611788e-08,
+  5.71117795253811e-08,
+  6.15096514366099e-09,
+  9.83609106797176e-10,
+  3.25535439059495e-09,
+  1.09258745805403e-05,
+  0.000366982242889485,
+  2.66823507237728e-09,
+  4.44999875484814e-08,
+  6.10013522693069e-08,
+  6.54253292274526e-09,
+  1.03563417170355e-09,
+  3.42011031052552e-09,
+  1.19132004707445e-05,
+  0.000407968875955051,
+  2.78322579093843e-09,
+  4.69480203335392e-08,
+  6.50866136734255e-08,
+  6.94027962576012e-09,
+  1.11043905872826e-09,
+  3.62700728167187e-09,
+  1.29923555531496e-05,
+  0.000453540574942479,
+  2.90550000263284e-09,
+  4.9600545177422e-08,
+  6.95046734167971e-08,
+  7.37756126592683e-09,
+  1.17012442240012e-09,
+  3.82244204858223e-09,
+  1.41681177748011e-05,
+  0.000504194842683884,
+  3.03053067520637e-09,
+  5.25182155500756e-08,
+  7.43289085190429e-08,
+  7.88488776808495e-09,
+  1.22032979998574e-09,
+  4.01518855177664e-09,
+  1.54493448664679e-05,
+  0.000560495883314058,
+  3.14905527075822e-09,
+  5.56305083710794e-08,
+  7.95544010577609e-08,
+  8.48300748634869e-09,
+  1.27842818922511e-09,
+  4.24226097973271e-09,
+  1.68493688846327e-05,
+  0.000623103202926965,
+  3.26049214627454e-09,
+  5.86962262961053e-08,
+  8.48980261091071e-08,
+  9.04111351384359e-09,
+  1.37604182066781e-09,
+  4.53987972980641e-09,
+  1.83803621869756e-05,
+  0.000692721291545962,
+  3.42686376834641e-09,
+  6.19493241644601e-08,
+  9.05957271773751e-08,
+  9.60696625690891e-09,
+  1.42327704889046e-09,
+  4.78840367770445e-09,
+  2.0045970568551e-05,
+  0.000770096233889851,
+  3.60665834495942e-09,
+  6.56268527120715e-08,
+  9.68881863166475e-08,
+  1.02823151420348e-08,
+  1.44330363147406e-09,
+  5.01686516002273e-09,
+  2.18602228277658e-05,
+  0.000856105521913014,
+  3.77346916574523e-09,
+  6.93575341383967e-08,
+  1.03400158424194e-07,
+  1.09214769856224e-08,
+  1.50465525457895e-09,
+  5.30674018098374e-09,
+  2.38422151349301e-05,
+  0.000951731572257739,
+  3.97794868596743e-09,
+  7.32372087792166e-08,
+  1.1023209546183e-07,
+  1.15286077934468e-08,
+  1.55784665789824e-09,
+  5.59897001535939e-09,
+  2.60040127715144e-05,
+  0.00105804335065949,
+  4.15817684156834e-09,
+  7.74088103955845e-08,
+  1.17552661731035e-07,
+  1.21759640351881e-08,
+  1.65151809990373e-09,
+  5.95869122483595e-09,
+  2.83660276865372e-05,
+  0.00117624944255868,
+  4.37580058417363e-09,
+  8.20554898379475e-08,
+  1.25578163951157e-07,
+  1.29162292703861e-08,
+  1.70657532338957e-09,
+  6.2872103217112e-09,
+  3.09396656499702e-05,
+  0.00130765255771877,
+  4.59253917419583e-09,
+  8.69976304405613e-08,
+  1.34146612036535e-07,
+  1.36861128123108e-08,
+  1.76662878537598e-09,
+  6.63276486227281e-09,
+  3.37462732030847e-05,
+  0.00145373194895797,
+  4.80556599631269e-09,
+  9.21214565351968e-08,
+  1.43169511097846e-07,
+  1.44386439770919e-08,
+  1.85101756974184e-09,
+  7.02331808698035e-09,
+  3.6808318788483e-05,
+  0.00161612495794339,
+  5.07667277080254e-09,
+  9.77743162589145e-08,
+  1.53023656087107e-07,
+  1.5282289318319e-08,
+  1.89504530718896e-09,
+  7.40335679019478e-09,
+  4.01466006541282e-05,
+  0.00179666391278427,
+  5.33273248951397e-09,
+  1.03712999371043e-07,
+  1.63493978626985e-07,
+  1.61411695579182e-08,
+  1.95220313839784e-09,
+  7.81882510348239e-09,
+  4.37877556627569e-05,
+  0.00199736931491416 ;
+}

@@ -1,0 +1,261 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&parameters
+ beta = 0
+ zeff = 1.0
+ tite = 1.0
+/
+
+&kt_grids_knobs
+ grid_option = "range"
+/
+
+
+
+
+
+
+&kt_grids_range_parameters
+
+
+ ntheta0 = 1
+ naky = 1
+
+
+ aky_min = 1.0
+ aky_max = 1.0
+
+
+ akx_min = 0.0
+ akx_max = 0.0
+
+
+
+
+
+/
+
+
+
+
+&theta_grid_parameters
+
+ ntheta = 48
+ nperiod = 1
+
+
+ eps = 0.0
+
+
+ epsl = 0.0
+
+
+ shat = 0.0
+
+
+ kp = 1.0
+
+ shift = 0.0
+/
+
+
+
+
+&theta_grid_knobs
+
+
+ equilibrium_option = "s-alpha"
+/
+
+
+
+
+&theta_grid_salpha_knobs
+ model_option = "default"
+/
+
+
+
+
+&le_grids_knobs
+ ngauss = 12
+ negrid = 12
+/
+
+
+
+
+&dist_fn_knobs
+
+
+ gridfac = 1.0
+
+
+ boundary_option = "periodic"
+ nonad_zero = .true.
+
+
+ g_exb = 0.0
+ omprimfac = 1.0
+/
+
+
+
+
+&fields_knobs
+ field_option = "implicit"
+/
+
+
+
+
+&knobs
+
+
+ wstar_units = .false.
+
+
+
+ fphi = 1.0
+ fapar = 0.0
+ fbpar = 0.0
+
+
+
+ delt = 0.0025
+ nstep = 50000
+ avail_cpu_time = 900
+ do_eigsolve = .true.
+/
+
+
+
+
+&reinit_knobs
+ delt_adj = 2.0
+ delt_minimum = 1.0e-06
+ abort_rapid_time_step_change = .true.
+/
+
+
+
+
+&layouts_knobs
+ layout = "lexys"
+/
+
+
+
+
+&collisions_knobs
+ collision_model = "default"
+/
+
+
+
+
+&nonlinear_terms_knobs
+ nonlinear_mode = "off"
+ flow_mode = "off"
+ cfl = 0.1
+/
+
+
+
+
+&species_knobs
+ nspec = 1
+/
+
+
+
+
+&species_parameters_1
+
+ type = "ion"
+ z = 1.0
+ mass = 1.0
+ dens = 1.0
+ temp = 1.0
+ vnewk = 0.01
+
+
+ tprim = 0.0
+ fprim = 0.0
+ uprim = 0.0
+
+ bess_fac = 0.0
+/
+
+
+
+
+&dist_fn_species_knobs_1
+ fexpr = 0.5
+ bakdif = 0.0
+/
+
+
+
+
+&init_g_knobs
+ chop_side = .false.
+ phiinit = 10
+ ginit_option = "noise"
+/
+
+
+
+
+&gs2_diagnostics_knobs
+ print_flux_line = .false.
+ write_nl_flux = .true.
+ print_line = .false.
+ write_verr = .true.
+ write_line = .false.
+ write_hrate = .false.
+ write_final_epar = .false.
+ write_avg_moments = .false.
+ write_omega = .false.
+ write_omavg = .true.
+ write_eigenfunc = .true.
+ write_final_fields = .true.
+ write_final_moments = .true.
+ nsave = 500
+ nwrite = 50
+ navg = 10
+ omegatol = -0.001
+ omegatinst = 500.0
+ save_for_restart = .false.
+ write_ascii = .true.
+ write_fields = .true.
+
+ write_phi_over_time = .true.
+ write_apar_over_time = .false.
+ write_bpar_over_time = .false.
+
+
+/
+
