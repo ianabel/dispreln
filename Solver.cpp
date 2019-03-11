@@ -13,6 +13,65 @@
  */
 
 namespace RootFinder {
+
+Complex BoundaryPoint( RootBoundingBox box, Complex z, Complex u )
+{
+	if ( !box.contains( z ) || box.contains( u ) )
+	{
+		// This shouldn't happen
+		throw std::invalid_argument( "BOX ERROR" );
+	}
+
+	Real theta_u = std::arg( box.upper - z );
+	Real theta_l = std::arg( box.lower - z );
+
+	Complex ul( box.lower.real(), box.upper.imag() );
+	Complex lr( box.upper.real(), box.lower.imag() );
+	Real theta_ul = std::arg( ul - z );
+	Real theta_lr = std::arg( lr - z );
+
+	Complex delta = ( u - z );
+
+
+	Real alpha = std::arg( delta );
+
+	Real Lambda;
+
+	if ( alpha > theta_u && alpha <= theta_ul )
+	{
+		// Through top edge
+		Lambda = ( box.upper.imag() - z.imag() )/( delta.imag() );
+	}
+	else if ( alpha <= theta_u && alpha > theta_lr )
+	{
+		// Right edge
+		Lambda = ( box.upper.real() - z.real() )/( delta.real() );
+	}
+	else if ( alpha <= theta_lr && alpha > theta_l )
+	{
+		// Bottom edge
+		Lambda = ( box.lower.imag() - z.imag() )/( delta.imag() );
+	}
+	else if ( alpha > theta_ul || alpha < theta_l )
+	{
+		// Left edge
+		Lambda = ( box.lower.real() - z.real() )/( delta.real() );
+	}
+	else
+	{
+		throw std::logic_error( "WAT1" );
+	}
+
+	if (  Lambda <= 0.0 || Lambda > 1.0 )
+		throw std::logic_error( "WAT2" );
+
+	if ( !box.contains( z + Lambda*.99*delta ) )
+		throw std::logic_error( "Logically this should never happen. Box apparently doesn't contain a point just inside the box?!?" );
+
+	return  ( z + Lambda*.99*delta );
+}
+
+
 Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol )
 {
 	// If box contains multiple roots, you are doing it all wrong
@@ -20,99 +79,70 @@ Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol )
 		throw std::invalid_argument( "No roots in box" );
 	if ( box.Index < 0 )
 		throw std::invalid_argument( "Box contains poles. Aborting." );
+
 	// We will assume there is *one* root, possibly with a high multiplicity
 
-	// We just do a secant solve from the centre, 
+	Complex xn,xn1,xn2;
+	Complex fn,fn1,fn2;
 
-	Complex z = box.centre(),u;
-	Complex fprimez = ( f( box.upper ) - f( box.lower ) )/( box.upper - box.lower );
-	Complex fz = f( z );
+	// Secant solves on pow( f(x), 1/N )
+	auto F = [&]( std::complex<double> Z ) { return std::pow( f( Z ), 1./box.Index );};
 
-	// Shouldn't need more than 10 steps.
+
+	xn2 = box.centre();
+	fn2 = F( xn2 );
+
+	// Secant step, using
+	Complex fprime = ( F( box.upper ) - F( box.lower ) )/( box.upper - box.lower );
+	xn1 = xn2 - fn2/fprime;
+	fn1 = F( xn1 );
+
+	// One more secant step
+	fprime = ( fn1 - fn2 )/( xn1 - xn2 );
+	xn = xn1 - fn1/fprime;
+	fn = F( xn );
+
+	// Shouldn't need more than 40 steps.
 	unsigned int MAX_ITER = 40;
-	unsigned int i;
-	std::list<Complex> u_list;
-	for ( i=0; i<MAX_ITER; i++ )
+	unsigned int i = 0;
+	Complex u;
+
+	for ( ; i<MAX_ITER; i++ )
 	{
-		if ( std::abs( fprimez ) < 1e-10 )
-		{
-			break;
-		}
-		// Compute next point
-		u = z - fz/fprimez;
-		if ( box.contains( u ) )
-			u_list.push_back( u );
+		// fn2 =  f(x_(n-2)) ; fn1 = f(x_(n-1)) ; fn = f(x_n)
+		// xn2 = x_(n-2) etc
+		fprime = ( fn - fn1 )/( xn - xn1 );
+		if ( std::abs( fprime ) > 1e-12 )
+			u = xn - fn/fprime;
 		else
 		{
-			// go to the box edge along -fz/fprime_z
-			Real theta_u = std::arg( box.upper - z );
-			Real theta_l = std::arg( box.lower - z );
-
-			Complex ul( box.lower.real(), box.upper.imag() );
-			Complex lr( box.upper.real(), box.lower.imag() );
-			Real theta_ul = std::arg( ul - z );
-			Real theta_lr = std::arg( lr - z );
-
-	
-			Real alpha = std::arg( u - z );
-
-			Real Lambda;
-
-			if ( alpha > theta_u && alpha <= theta_ul )
-			{
-				// Through top edge
-				Lambda = ( box.upper.imag() - z.imag() )/( ( -fz/fprimez ).imag() );
-			}
-			else if ( alpha <= theta_u && alpha > theta_lr )
-			{
-				// Right edge
-				Lambda = ( box.upper.real() - z.real() )/( ( -fz/fprimez ).real() );
-			}
-			else if ( alpha <= theta_lr && alpha > theta_l )
-			{
-				// Bottom edge
-				Lambda = ( box.lower.imag() - z.imag() )/( ( -fz/fprimez ).imag() );
-			}
-			else if ( alpha > theta_ul || alpha < theta_l )
-			{
-				// Left edge
-				Lambda = ( box.lower.real() - z.real() )/( ( -fz/fprimez ).real() );
-			}
-			else
-			{
-				throw std::logic_error( "WAT" );
-			}
-
-			if (  Lambda <= 0.0 || Lambda >= 1.0 )
-				throw std::logic_error( "WAT" );
-
-
-			u = z - Lambda*.99*fz/fprimez;
-			if ( box.contains( u ) )
-				u_list.push_back( u );
-			else
-				throw std::logic_error( "WAT" );
+			throw std::logic_error( "Not Yet Implemented backup plan." );
+		}
+				
+		if ( !box.contains( u ) )
+		{
+			// xn was in the box, u is not, so pick the point just inside the 
+			// boundary along the line from xn to u
+			u = BoundaryPoint( box, xn, u );
 		}
 
-		// Check for convergence
-		// if( |u-z| < tol * |z| ) we're done
-		if ( std::abs( u - z ) < tol*std::abs( z ) )
-			break;
-		// Compute an approximation to f'(u)
-		Complex fu = f( u );
-		fprimez = ( fu - fz )/( u - z );
-		if ( isnan( fu.real() ) || isnan( fu.imag() ) || isnan( fprimez.real() ) || isnan( fprimez.imag() ) )
-			throw std::logic_error( "Function to be solved returned a NaN!" );
+		if( std::abs( u - xn ) < tol*std::abs( u ) )
+			return u;
 
-		// move from z -> u
-		z = u;
-		fz = fu;
+
+
+		fn2 = fn1;
+		xn2 = xn1;
+		fn1 = fn;
+		xn1 = xn;
+		xn = u;
+		fn = F( u );
 	}
 
 	if ( i == MAX_ITER )
 	{
 		// Something probably went wrong, this shouldn't really happen.
-		throw std::logic_error( "Maximum secant iterations exceeded" );
+		throw std::logic_error( "Maximum iterations exceeded in DrectSolve" );
 	}
 
 	return u;

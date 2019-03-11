@@ -42,18 +42,21 @@ BOOST_AUTO_TEST_CASE( polynomial_root_tests, * boost::unit_test::tolerance( 1e-1
 	BOOST_TEST( WindingNumber( RectangleImage( b, c, P ) ) == 1 );
 	BOOST_TEST( WindingNumber( RectangleImage( d, c, P ) ) == 2 );
 
-	std::list<Complex> roots = FindWithin( RootBoundingBox( b, c, 1 ), P, 1e-13 );
+	std::list<Complex> roots = FindWithin< std::list<Complex> >( RootBoundingBox( b, c, 1 ), P, 1e-13 );
 	Complex exact = ::sqrt( 2.0 )*std::complex<double>( 1.0, 1.0 );
 
 	BOOST_TEST( roots.size() == 1 );
 	BOOST_TEST( std::abs( roots.front() - exact ) == 0.0 );
 
-	// And with a double root 
-	Func Q = [=]( Complex z ){ return ( z-exact )*( z*z - std::complex<Real>( 0.0, 4.0 ) );};
-	roots = FindWithin( RootBoundingBox( b, c, 1 ), Q, 1e-15 );
+	// And with higher-order roots
+	auto Q = [=]( Complex z, unsigned int n ){ return pow( z-exact, n );};
+	for ( unsigned int n=3; n < 10; n++ )
+	{
+		roots = FindWithin< std::list<Complex> >( RootBoundingBox( b, c, 1 ), std::bind( Q, std::placeholders::_1, n ), 1e-15 );
+		BOOST_TEST( roots.size() == 1 );
+		BOOST_TEST( std::abs( roots.front() - exact ) == 0.0 );
+	}
 
-	BOOST_TEST( roots.size() == 1 );
-	BOOST_TEST( std::abs( roots.front() - exact ) == 0.0 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

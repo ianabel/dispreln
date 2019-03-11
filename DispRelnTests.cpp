@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE( acoustic_wave_test )
 {
 	RootBoundingBox FirstTwo( 0.0 - 2.0*I, 10.0, 0.0 );
 	Func DispFn = std::bind( DispReln::AcousticDisp, std::placeholders::_1, 1.0 );
-	std::list<Complex> roots = FindWithin( FirstTwo, DispFn, 1e-11 );
+	std::list<Complex> roots = FindWithin< std::list< Complex > >( FirstTwo, DispFn, 1e-11 );
 	roots.sort( []( const Complex &x, const Complex &y ){ return ( x.imag() > y.imag() );} );
 
 	BOOST_TEST( roots.size() == 2 );
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE( acoustic_wave_test )
 
 	// Z/tau = 0.01, so cold ions, which gives rise to the undamped ion acoustic mode
 	DispFn = std::bind( DispReln::AcousticDisp, std::placeholders::_1, 0.01 );
-	roots = FindWithin( FirstTwo, DispFn, 1e-11 );
+	roots = FindWithin< std::list< Complex > >( FirstTwo, DispFn, 1e-11 );
 	roots.sort( []( const Complex &x, const Complex &y ){ return ( x.imag() > y.imag() );} );
 
 	BOOST_TEST( roots.size() == 2 );
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_SUITE( config_tests )
 
 BOOST_AUTO_TEST_CASE( example1_test )
 {
-	static std::string config_file( "examples/DriftWaveConfig.xml" );
+	static std::string config_file( "test-data/DriftWaveConfig.xml" );
 	DispReln::ElectrostaticSlab DriftSlab =  DispReln::Config::ReadConfig<DispReln::ElectrostaticSlab>( config_file );
 
 	BOOST_TEST( DriftSlab.SpeciesList.size() == 2 );
@@ -183,14 +183,14 @@ BOOST_AUTO_TEST_CASE( example1_test )
 	BOOST_TEST( ions.Density == 1.0 );
 	BOOST_TEST( ions.Z == 1.0 );
 	BOOST_TEST( ions.mass == 1.0 );
-	BOOST_TEST( ions.fprim == 7.0 );
+	BOOST_TEST( ions.fprim == 10.0 );
 	BOOST_TEST( ions.tprim == 0.0 );
 
 	BOOST_TEST( electrons.Temperature == 1.0 );
 	BOOST_TEST( electrons.Density == 1.0 );
 	BOOST_TEST( electrons.Z == -1.0 );
-	BOOST_TEST( electrons.mass == 0.000272443711 );
-	BOOST_TEST( electrons.fprim == 7.0 );
+	BOOST_TEST( electrons.mass == 0.0002724 );
+	BOOST_TEST( electrons.fprim == 10.0 );
 	BOOST_TEST( electrons.tprim == 0.0 );
 
 	auto scans = DispReln::Config::GenerateScans( config_file );
@@ -214,10 +214,6 @@ BOOST_AUTO_TEST_CASE( example1_test )
 
 	BOOST_TEST( MainScan.box.lower == l );
 	BOOST_TEST( MainScan.box.upper == u );
-
-
-
-
 
 }
 

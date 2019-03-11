@@ -33,7 +33,8 @@ namespace DispReln {
 			{ "ky", ScanTypes::ky },
 			{ "fprim", ScanTypes::fprim },
 			{ "tprim", ScanTypes::tprim },
-			{ "beta_ref", ScanTypes::beta }
+			{ "beta_ref", ScanTypes::beta },
+			{ "fprim_adj", ScanTypes::fprim_adj }
 		};
 
 		static const std::map< std::string, Normalization > NormMap{
@@ -119,7 +120,7 @@ namespace DispReln {
 				{
 					ScanTypes param = ScanTypes::Invalid;
 					ScanMode mode;
-					unsigned int speciesIndex = 0;
+					unsigned int speciesIndex = 0, adjustIndex = 0;
 
 					std::string type = tags.second.get<std::string>( "<xmlattr>.type" );
 					if ( type == "MostUnstableMode" )
@@ -151,12 +152,25 @@ namespace DispReln {
 						}
 					}
 
+					if ( param == ScanTypes::fprim_adj )
+					{
+						// Needs a species index
+						try {
+							speciesIndex = tags.second.get<unsigned int>( "<xmlattr>.species" );
+							adjustIndex = tags.second.get<unsigned int>( "<xmlattr>.adjust" );
+						} catch ( ... )
+						{
+							throw std::invalid_argument( "With an adjusting fprim scan, you need to specify both the primary species and the compensating one." );
+						}
+					}
+
 					double Tolerance = tags.second.get( "<xmlattr>.tol", 0.001 );
 
 
 					Scan badger_Scan( param, mode );
 					badger_Scan.beta = 0.0;
 					badger_Scan.sIndex = speciesIndex;
+					badger_Scan.adjIndex = adjustIndex;
 					badger_Scan.tolerance = Tolerance;
 					badger_Scan.normalization = Normalization::Default;
 

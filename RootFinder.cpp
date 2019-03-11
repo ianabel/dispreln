@@ -47,7 +47,7 @@ int WindingNumber( Path C, unsigned int N )
 			Cr = C( r );
 		}
 
-		if ( std::abs( Cs ) < 1e-100 )
+		if ( std::abs( Cs ) < 1e-200 )
 		{
 			throw std::invalid_argument( "Curve gets too close to zero" );
 		}

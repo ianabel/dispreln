@@ -21,7 +21,7 @@ namespace RootFinder {
 	using Path = std::function< Complex( Real )>;
 	using Func = std::function< Complex( Complex )>;
 
-	int WindingNumber( Path, unsigned int N=400 );
+	int WindingNumber( Path, unsigned int N=800 );
 	Path Rectangle( Complex lower, Complex upper );
 	Path RectangleImage( Complex a, Complex b, Func const & f );
 	Path Image( Simplex const &T, Func const & f );
@@ -220,7 +220,9 @@ namespace RootFinder {
 			DispersionObject.set_param( alpha );
 			auto roots = FindWithin< std::list<Complex> >( box, DispersionObject, tol );
 			if ( roots.size() == 0 )
-				throw std::logic_error( "Bad Box" );
+			{
+				throw std::logic_error( "No Roots Found In Box!" );
+			}
 			roots.sort( MostUnstable );
 			Complex root = roots.front();
 			RootList.emplace_back( root, alpha );

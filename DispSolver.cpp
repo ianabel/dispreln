@@ -51,6 +51,15 @@ std::string Header( DispReln::Config::Scan const& Scan, bool want_col_header = t
 			out << "# Scanning in k_x ";
 			col_header = "# k_x\tomega\tgamma";
 			break;
+		case DispReln::Config::ScanTypes::fprim:
+			out << "# Scanning in fprim of species " << Scan.sIndex << " ";
+			col_header = "# L_ref/L_n\tomega\tgamma";
+			break;
+		case DispReln::Config::ScanTypes::fprim_adj:
+			out << "# Scanning in fprim of species " << Scan.sIndex << " and adjusting fprim of species " << Scan.adjIndex << " to maintain quasineutrality";
+			out << std::endl << "# ";
+			col_header = "# L_ref/L_n\tomega\tgamma";
+			break;
 		default:
 			break;
 	}
@@ -69,7 +78,7 @@ std::string Header( DispReln::Config::Scan const& Scan, bool want_col_header = t
 			break;
 	}
 
-	out << "# The scan will be perofmed holding the following values fixed:" << std::endl;
+	out << "# The scan will be performed holding the following values fixed:" << std::endl;
 	std::map< DispReln::Config::ScanTypes, std::string > outfixed{
 		{ DispReln::Config::ScanTypes::kpar, "k_||" },
 		{ DispReln::Config::ScanTypes::kx, "k_x" },
@@ -141,6 +150,8 @@ template<typename T> std::deque<RootPair> PerformScan( DispReln::Config::Scan Ma
 	DispReln::kx_scanner<T> kxScan( physics );
 	DispReln::fprim_scanner<T> fprimScan( physics, MainScan.sIndex );
 	DispReln::tprim_scanner<T> tprimScan( physics, MainScan.sIndex );
+	DispReln::fprim_adj_scanner<T> fprimAdjScan( physics, MainScan.sIndex, MainScan.adjIndex );
+
 
 	switch ( MainScan.parameter )
 	{
@@ -158,6 +169,9 @@ template<typename T> std::deque<RootPair> PerformScan( DispReln::Config::Scan Ma
 			break;
 		case DispReln::Config::ScanTypes::tprim:
 			scan = DoScan( MainScan, tprimScan );
+			break;
+		case DispReln::Config::ScanTypes::fprim_adj:
+			scan = DoScan( MainScan, fprimAdjScan );
 			break;
 
 		default:
@@ -266,7 +280,7 @@ template<typename T> void ListScan( DispReln::Config::Scan const& scan, T const&
 			break;
 	}
 
-	std::cout << "The scan will be perofmed holding the following values fixed:" << std::endl;
+	std::cout << "The scan will be performed holding the following values fixed:" << std::endl;
 	std::map< DispReln::Config::ScanTypes, std::string > outfixed{
 		{ DispReln::Config::ScanTypes::kpar, "k_||" },
 		{ DispReln::Config::ScanTypes::kx, "k_x" },
@@ -330,6 +344,8 @@ int main( int argc, char** argv )
 	auto scans = DispReln::Config::GenerateScans( config_file );
 	DispReln::GKSlab FullSlab;
 	DispReln::ElectrostaticSlab ESSlab;
+
+	std::cout << std::setprecision( 10 );
 
 	if ( Simulate )
 	{
