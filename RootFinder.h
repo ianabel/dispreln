@@ -21,7 +21,7 @@ namespace RootFinder {
 	using Path = std::function< Complex( Real )>;
 	using Func = std::function< Complex( Complex )>;
 
-	int WindingNumber( Path, unsigned int N=800 );
+	int WindingNumber( Path, unsigned int N=2000 );
 	Path Rectangle( Complex lower, Complex upper );
 	Path RectangleImage( Complex a, Complex b, Func const & f );
 	Path Image( Simplex const &T, Func const & f );

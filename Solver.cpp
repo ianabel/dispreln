@@ -1,5 +1,6 @@
 
 #include "RootFinder.h"
+#include <cmath>
 
 /*
  * These routines take a bounding box or simplex that is guaranteed to contain one root
@@ -52,7 +53,7 @@ Complex BoundaryPoint( RootBoundingBox box, Complex z, Complex u )
 		// Bottom edge
 		Lambda = ( box.lower.imag() - z.imag() )/( delta.imag() );
 	}
-	else if ( alpha > theta_ul || alpha < theta_l )
+	else if ( alpha > theta_ul || alpha <= theta_l )
 	{
 		// Left edge
 		Lambda = ( box.lower.real() - z.real() )/( delta.real() );
@@ -89,17 +90,17 @@ Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol )
 	auto F = [&]( std::complex<double> Z ) { return std::pow( f( Z ), 1./box.Index );};
 
 
-	xn2 = box.centre();
-	fn2 = F( xn2 );
 
-	// Secant step, using
-	Complex fprime = ( F( box.upper ) - F( box.lower ) )/( box.upper - box.lower );
-	xn1 = xn2 - fn2/fprime;
+	// Secant step, starting from the centre of the box
+	xn1 = box.centre();
 	fn1 = F( xn1 );
+	Complex fprime = ( F( box.upper ) - F( box.lower ) )/( box.upper - box.lower );
 
-	// One more secant step
-	fprime = ( fn1 - fn2 )/( xn1 - xn2 );
 	xn = xn1 - fn1/fprime;
+
+	if ( !box.contains( xn ) )
+		xn = BoundaryPoint( box, xn1, xn );
+	
 	fn = F( xn );
 
 	// Shouldn't need more than 40 steps.
@@ -112,10 +113,14 @@ Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol )
 		// fn2 =  f(x_(n-2)) ; fn1 = f(x_(n-1)) ; fn = f(x_n)
 		// xn2 = x_(n-2) etc
 		fprime = ( fn - fn1 )/( xn - xn1 );
-		if ( std::abs( fprime ) > 1e-12 )
+		if ( std::abs( fprime ) > 1e-14 )
 			u = xn - fn/fprime;
 		else
 		{
+			std::cerr << "u currently = " << u << " with f(u) = " << f( u ) << std::endl;
+			std::cerr << "box.Index = " << box.Index << std::endl;
+			std::cerr << "(xn, fn, fprime) = (" << xn << ", " << fn << ", " << fprime << ")" << std::endl;
+			return std::nan( "" );
 			throw std::logic_error( "Not Yet Implemented backup plan." );
 		}
 				
@@ -129,10 +134,6 @@ Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol )
 		if( std::abs( u - xn ) < tol*std::abs( u ) )
 			return u;
 
-
-
-		fn2 = fn1;
-		xn2 = xn1;
 		fn1 = fn;
 		xn1 = xn;
 		xn = u;

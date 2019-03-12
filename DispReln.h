@@ -149,12 +149,14 @@ namespace DispReln {
 
 					Complex xi_s = x.vt*xi;
 					
-					// D += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
+					D += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) 
+							             - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
 
-					D += ( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) );
+					// D += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) );
 				}
 				return D;
 			}
+
 			void set_kpar( double kp ){_kpar = kp;recalculate();};
 			void set_kx( double kx ){_kx= kx;recalculate();};
 			void set_ky( double ky ){_ky= ky;recalculate();};
@@ -188,7 +190,7 @@ namespace DispReln {
 					x.s.rho = ::sqrt( x.s.Temperature * x.s.mass )/::abs( x.s.Z );
 					x.vt = ::sqrt( x.s.mass / x.s.Temperature );
 					x.boltz = x.s.Z * x.s.Z * x.s.Density / x.s.Temperature;
-					x.om_star = -1.0 * ( x.s.Z / ::abs ( x.s.Z ) )*0.5 * _ky * ( x.s.rho ) * x.s.fprim /  _kpar;
+					x.om_star   = -1.0 * ( x.s.Z / ::abs ( x.s.Z ) )*0.5 * _ky * ( x.s.rho ) * x.s.fprim /  _kpar;
 					x.om_star_t = -1.0 * ( x.s.Z / ::abs ( x.s.Z ) )*0.5 * _ky * ( x.s.rho ) * x.s.tprim /  _kpar;
 					x.alpha = ( _ky*_ky + _kx*_kx )*( x.s.rho * x.s.rho )/2.0;
 				}
