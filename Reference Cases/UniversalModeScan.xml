@@ -1,0 +1,55 @@
+
+<electrostatic_slab>
+	<species Temperature="1.0" Density="1.0" Charge="1.0" Mass="1.0" fprim="20" tprim="0.0"/>
+	<species Temperature="1.0" Density="1.0" Charge="-1.0" Mass=".00027275" fprim="20" tprim="0.0"/>
+</electrostatic_slab>
+
+<scan parameter="fprim_adj" type="MostUnstableMode" tol="1e-8" species="0" adjust="1">
+	<fixed kpar="1.0" kx="0.0" ky="1.0"/>
+	<box>
+		<lower>(0.0,-1.0)</lower>
+		<upper>(12.0,3.0)</upper>
+	</box>
+	<!-- Fprim @ k_perp rho = 1 from Matt's Output-->
+	<val>47.42747411</val>
+	<val>35.5655882</val>
+	<val>26.67042864</val>
+	<val>20.</val>
+	<val>14.99788419</val>
+	<val>11.2468265</val>
+	<val>8.43393007</val>
+	<val>6.32455532</val>
+	<val>4.74274741</val>
+	<val>3.55655882</val>
+	<val>2.66704286</val>
+	<val>2.</val>
+</scan>
+
+<scan parameter="fprim_adj" type="MostUnstableMode" tol="1e-8" species="0" adjust="1">
+	<fixed kpar="1.0" kx="0.0" ky="10.0"/>
+	<box>
+		<lower>(0.0,-2.0)</lower>
+		<upper>(2.0,2.0)</upper>
+	</box>
+	<!-- Fprim @ k_perp rho = 10 from Matt's Output-->
+	<val>35.56558820077846</val>
+	<val>26.670428643266483</val>
+	<val>20.0</val>
+	<val>14.997884186649117</val>
+	<val>11.24682650380698</val>
+	<val>8.433930068571645</val>
+	<val>6.32455532033676</val>
+	<val>4.742747411323311</val>
+	<val>3.5565588200778455</val>
+	<val>2.6670428643266484</val>
+	<val>2.0</val>
+	<val>1.4997884186649117</val>
+	<val>1.1246826503806981</val>
+	<val>0.8433930068571646</val>
+	<val>0.6324555320336759</val>
+	<val>0.4742747411323311</val>
+	<val>0.35565588200778453</val>
+	<val>0.2667042864326648</val>
+	<val>0.2</val>
+
+</scan>
