@@ -143,7 +143,8 @@ Complex DirectSolve( RootBoundingBox box, Func const & f, Real tol )
 	if ( i == MAX_ITER )
 	{
 		// Something probably went wrong, this shouldn't really happen.
-		throw std::logic_error( "Maximum iterations exceeded in DrectSolve" );
+		return std::nan( "" );
+		throw std::logic_error( "Maximum iterations exceeded in DirectSolve" );
 	}
 
 	return u;

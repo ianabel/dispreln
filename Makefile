@@ -26,6 +26,9 @@ all: DispSolver
 DispSolver: DispSolver.cpp Solver.cpp RootFinder.cpp RootFinder.h Faddeeva.o Faddeeva.hh DispReln.cpp DispReln.h Config.cpp ExpBessel.h Config.h
 	$(CXX) $(CXXFLAGS) $(CXXRELEASEFLAGS) -lboost_program_options -o $@ DispSolver.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
 
+DispHarness: DispHarness.cpp Solver.cpp RootFinder.cpp RootFinder.h Faddeeva.o Faddeeva.hh DispReln.cpp DispReln.h Config.cpp ExpBessel.h Config.h
+	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) -lboost_program_options -o $@ DispHarness.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
+
 DispSolverDebug: DispSolver.cpp Solver.cpp RootFinder.cpp RootFinder.h Faddeeva.o Faddeeva.hh DispReln.cpp DispReln.h Config.cpp ExpBessel.h Config.h
 	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS)  -lboost_program_options -o $@ DispSolver.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
 

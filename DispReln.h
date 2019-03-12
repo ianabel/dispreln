@@ -149,7 +149,7 @@ namespace DispReln {
 
 					Complex xi_s = x.vt*xi;
 					
-					D += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) 
+					D += ( x.boltz )*( 1.0 + ( xi_s - x.om_star + 1.5*x.om_star_t )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) 
 							             - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
 
 					// D += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) );
@@ -258,11 +258,13 @@ namespace DispReln {
 				{
 					Complex xi_s = x.vt*xi;
 
-					A += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
-					B += ( x.boltz/x.vt ) * ( xi_s  - ( xi_s - x.om_star )*Gamma<1,0,0>( x.alpha ) + x.om_star_t*( Gamma<3,0,0>( x.alpha ) + 0.5*Gamma<1,0,0>( x.alpha ) ) );
-					C += ( x.s.Z * x.s.Density ) * ( ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<2,1,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<4,1,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<2,1,0>( x.alpha ) ) );
-					D += ( x.s.Temperature * x.s.Density ) * ( ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<3,1,1>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<5,1,1>( x.alpha ) + Zeta<2>( xi_s )*Gamma<3,1,1>( x.alpha ) ) );
-					E += ( x.s.Z/x.vt ) * ( ( xi_s - x.om_star )*Gamma<2,1,0>( x.alpha ) - x.om_star_t*( Gamma<4,1,0>( x.alpha ) + 0.5*Gamma<2,1,0>( x.alpha ) ) );
+					double om_kappa = x.om_star - 1.5*x.om_star_t;
+					double om_eta = x.om_star_t;
+					A += ( x.boltz )*( 1.0 + ( xi_s - om_kappa )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - om_eta*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
+					B += ( x.boltz/x.vt ) * ( xi_s  - ( xi_s - om_kappa )*Gamma<1,0,0>( x.alpha ) + om_eta*( Gamma<3,0,0>( x.alpha ) + 0.5*Gamma<1,0,0>( x.alpha ) ) );
+					C += ( x.s.Z * x.s.Density ) * ( ( xi_s - om_kappa )*Zeta<0>( xi_s )*Gamma<2,1,0>( x.alpha ) - om_eta*( Zeta<0>( xi_s )*Gamma<4,1,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<2,1,0>( x.alpha ) ) );
+					D += ( x.s.Temperature * x.s.Density ) * ( ( xi_s - om_kappa )*Zeta<0>( xi_s )*Gamma<3,1,1>( x.alpha ) - om_eta*( Zeta<0>( xi_s )*Gamma<5,1,1>( x.alpha ) + Zeta<2>( xi_s )*Gamma<3,1,1>( x.alpha ) ) );
+					E += ( x.s.Z/x.vt ) * ( ( xi_s - om_kappa )*Gamma<2,1,0>( x.alpha ) - om_eta*( Gamma<4,1,0>( x.alpha ) + 0.5*Gamma<2,1,0>( x.alpha ) ) );
 
 					/*
 					A += ( x.boltz )*( 1.0 + xi_s*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) );
@@ -380,8 +382,8 @@ namespace DispReln {
 				{
 
 					Complex xi_s = x.vt*xi;
-					A += ( x.boltz )*( 1.0 + ( xi_s - x.om_star )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
-					B += ( x.boltz/x.vt ) * ( xi_s  - ( xi_s - x.om_star )*Gamma<1,0,0>( x.alpha ) + x.om_star_t*( Gamma<3,0,0>( x.alpha ) + 0.5*Gamma<1,0,0>( x.alpha ) ) );
+					A += ( x.boltz )*( 1.0 + ( xi_s - x.om_star + 1.5*x.om_star_t )*Zeta<0>( xi_s )*Gamma<1,0,0>( x.alpha ) - x.om_star_t*( Zeta<0>( xi_s )*Gamma<3,0,0>( x.alpha ) + Zeta<2>( xi_s )*Gamma<1,0,0>( x.alpha ) ) );
+					B += ( x.boltz/x.vt ) * ( xi_s  - ( xi_s - x.om_star + 1.5*x.om_star_t )*Gamma<1,0,0>( x.alpha ) + x.om_star_t*( Gamma<3,0,0>( x.alpha ) + 0.5*Gamma<1,0,0>( x.alpha ) ) );
 				}
 				return ( A*alpha_ref/( xi*xi*beta_ref ) - A*B + B*B );
 			}
