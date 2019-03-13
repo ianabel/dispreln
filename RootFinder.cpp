@@ -154,7 +154,12 @@ std::list< RootBoundingBox > Refine( RootBoundingBox outerBox, Func const & f, u
 
 	for ( auto& box : fine_grid )
 	{
-		box.Index = WindingNumber( RectangleImage( box.lower, box.upper, f ) );
+		double box_len = box.Perimeter();
+		unsigned int N_points = static_cast<unsigned int>(  std::trunc( 2000 * box_len ) );
+		if ( N_points < 800 )
+			N_points = 800;
+
+		box.Index = WindingNumber( RectangleImage( box.lower, box.upper, f ), N_points );
 		if ( box.Index > 0 )
 		{
 			results.emplace_back( box.lower, box.upper, box.Index );

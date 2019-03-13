@@ -1,6 +1,7 @@
 #ifndef ROOTFINDER_H
 #define ROOTFINDER_H
 
+#include <cmath>
 #include <complex>
 #include <functional>
 #include <vector>
@@ -64,7 +65,11 @@ namespace RootFinder {
 		};
 
 		Complex centre() const { return ( lower + upper )/2.0; };
-		Complex diag() const { return ( lower - upper )/2.0; };
+		Complex diag() const { return ( upper - lower )/2.0; };
+		double Perimeter() const { 
+			Complex _z = upper - lower;
+			return ::fabs( _z.real() ) + ::fabs( _z.imag() );
+		};
 
 		bool contains( Complex x ) {
 			return ( x.real() > lower.real() && x.real() < upper.real() ) && ( x.imag() > lower.imag() && x.imag() < upper.imag() );
@@ -210,6 +215,7 @@ namespace RootFinder {
 	{
 		RootBoundingBox box = Initial;
 		Real centre_in_omega = box.centre().real();
+		Real width = ::fabs( box.diag().real() );
 		std::deque< std::pair< Complex, Real > > RootList;
 
 		for ( auto alpha : parameters ) 
@@ -221,12 +227,24 @@ namespace RootFinder {
 			auto roots = FindWithin< std::list<Complex> >( box, DispersionObject, tol );
 			if ( roots.size() == 0 )
 			{
-				throw std::logic_error( "No Roots Found In Box!" );
+				std::cerr << "No roots found in " << box << " at param = " << alpha << std::endl;
+				continue;
 			}
-			roots.sort( MostUnstable );
-			Complex root = roots.front();
-			RootList.emplace_back( root, alpha );
-			box.recentre( centre_in_omega + root.imag() * I );
+			else
+			{
+				roots.sort( MostUnstable );
+				Complex root = roots.front();
+				RootList.emplace_back( root, alpha );
+				if ( ( root.real() - centre_in_omega )/width > 0.75 )
+				{
+					box.recentre( centre_in_omega + width/2.0 + root.imag() * I );
+					centre_in_omega = box.centre().real();
+				}
+				else
+				{
+					box.recentre( centre_in_omega + root.imag() * I );
+				}
+			}
 		}
 		return RootList;
 	}
