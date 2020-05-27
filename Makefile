@@ -17,7 +17,6 @@ endif
 
 CXXFLAGS += -Wall -pedantic -std=c++17
 CXXDEBUGFLAGS +=  -O0 -g
-CXXTESTFLAGS +=   -DBOOST_TEST_DYN_LINK -lboost_unit_test_framework
 CXXRELEASEFLAGS += -Ofast
 
 
@@ -35,15 +34,15 @@ DispSolverDebug: DispSolver.cpp Solver.cpp RootFinder.cpp RootFinder.h Faddeeva.
 
 
 test: RootFindingTests DispRelnTests
-	LD_LIBRARY_PATH=$(BOOSTLIBDIR) ./RootFindingTests
-	LD_LIBRARY_PATH=$(BOOSTLIBDIR) ./DispRelnTests
+	./RootFindingTests
+	./DispRelnTests
 
 
 RootFindingTests: RootFindingTests.cpp RootFinder.h RootFinder.cpp Solver.cpp
-	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) $(CXXTESTFLAGS) -o $@ RootFindingTests.cpp RootFinder.cpp Solver.cpp
+	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) -o $@ RootFindingTests.cpp RootFinder.cpp Solver.cpp
 
 DispRelnTests: DispRelnTests.cpp RootFinder.h DispReln.cpp DispReln.h RootFinder.cpp Solver.cpp  Faddeeva.o Faddeeva.hh Config.h Config.cpp ExpBessel.h
-	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) $(CXXTESTFLAGS) -o $@ DispRelnTests.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
+	$(CXX) $(CXXFLAGS) $(CXXDEBUGFLAGS) -o $@ DispRelnTests.cpp RootFinder.cpp Solver.cpp Faddeeva.o DispReln.cpp Config.cpp
 
 # We never need a debug-enabled version of this.
 Faddeeva.o: Faddeeva.cc Faddeeva.hh

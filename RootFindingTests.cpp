@@ -1,6 +1,6 @@
 
 #define BOOST_TEST_MODULE gk_dispersion_tests
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/mpl/list.hpp>
 #include <boost/math/constants/constants.hpp>
 
