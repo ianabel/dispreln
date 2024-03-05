@@ -5,10 +5,10 @@
 </electrostatic_slab>
 
 <scan parameter="kpar" type="MostUnstableMode" tolerance="1e-10">
-	<fixed ky="10.0" kx="0.0"/>
+	<fixed ky="80.0" kx="0.0"/>
 	<box>
-		<lower>(0.0,-10.0)</lower>
-		<upper>(80.0,10.0)</upper>
+		<lower>(50.0,0.0)</lower>
+		<upper>(150.0,80.0)</upper>
 	</box>
 	<range>
 		<llim>1</llim>
@@ -17,28 +17,3 @@
 	</range>
 </scan>
 
-<scan parameter="kpar" type="MostUnstableMode" tolerance="1e-10">
-	<fixed ky="50.0" kx="0.0"/>
-	<box>
-		<lower>(0.0,-10.0)</lower>
-		<upper>(80.0,10.0)</upper>
-	</box>
-	<range>
-		<llim>1</llim>
-		<ulim>20</ulim>
-		<increment>1</increment>
-	</range>
-</scan>
-
-<scan parameter="kpar" type="MostUnstableMode" tolerance="1e-10">
-	<fixed ky="100.0" kx="0.0"/>
-	<box>
-		<lower>(0.0,-10.0)</lower>
-		<upper>(80.0,10.0)</upper>
-	</box>
-	<range>
-		<llim>1</llim>
-		<ulim>20</ulim>
-		<increment>1</increment>
-	</range>
-</scan>

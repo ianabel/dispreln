@@ -48,7 +48,7 @@ namespace DispReln {
 	// We don't need this, but if someone else ever does, they can write it :)
 	template<unsigned int i> inline double ExpBessel( double z ) {
 		if ( z < 512.0 )
-			return std::exp( -z )*std::cyl_bessel_i( 0.0, z );
+			return std::exp( -z )*std::cyl_bessel_i( i, z );
 		else
 			throw std::logic_error( "Unimplemented." );
 	}

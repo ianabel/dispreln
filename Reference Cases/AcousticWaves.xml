@@ -7,13 +7,13 @@
 <scan parameter="ky" type="MostUnstableMode">
 	<fixed kpar="1.0" kx="0.0"/>
 	<box>
-		<lower>(-5.0,-2.0)</lower>
+		<lower>(0.0,-2.0)</lower>
 		<upper>(5.0,2.0)</upper>
 	</box>
 	<range>
-		<llim>0.25</llim>
-		<ulim>2.0</ulim>
-		<increment>0.25</increment>
+		<llim>0.0</llim>
+		<ulim>1.0</ulim>
+		<increment>.03535533905932737622</increment>
 	</range>
 
 </scan>

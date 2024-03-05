@@ -203,7 +203,7 @@ template<> void OutputScan<DispReln::ElectrostaticSlab>( DispReln::Config::Scan 
 	}
 	for ( auto &x : scan_results )
 	{
-		std::cout << x.second << "\t" << x.first.real()/norm << "\t" << x.first.imag()/norm << std::endl;
+		std::cout << x.second/::sqrt( 2.0 ) << "\t" << x.first.real()*::sqrt( 2 )/norm << "\t" << x.first.imag()*::sqrt( 2 )/norm << std::endl;
 	}
 
 	std::cout << Footer( scan ) << std::endl;
@@ -238,7 +238,7 @@ template<> void OutputScan<DispReln::GKSlab>( DispReln::Config::Scan const& scan
 	}
 	for ( auto &x : scan_results )
 	{
-		std::cout << x.second << "\t" << x.first.real()/norm << "\t" << x.first.imag()/norm << std::endl;
+		std::cout << x.second/::sqrt( 2.0 ) << "\t" << x.first.real()*::sqrt( 2 )/norm << "\t" << x.first.imag()*::sqrt( 2 )/norm << std::endl;
 	}
 
 	std::cout << Footer( scan ) << std::endl;
